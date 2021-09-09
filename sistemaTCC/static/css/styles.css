@@ -1,0 +1,67 @@
+main {
+    width: 100%;
+    padding: 0 30px;
+  }
+  
+  main header {
+    width: 100%;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    font-size: 2rem;
+  }
+  
+  main section {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 30px;
+    margin-top: 50px;
+  }
+  
+  main section div {
+    height: 134px;
+    width: 100%;
+    background: #fff;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    transition: all 0.4s ease-in-out;
+    border: 2px solid #fff;
+  
+  }
+  
+  main section div:hover {
+    border: 2px solid;
+    color: #3751FF;
+  }
+  
+  main section div h1 {
+    font-size: 5rem;
+  }
+  
+  main section div p {
+    font-size: 2rem;
+  }
+  
+  .painel {
+    width: 100%;
+    background-color: #fff;
+    padding: 20px;
+    height: 100%;
+  }
+  
+  .grafico {
+    background: #fff;
+    padding: 20px 32px;
+    margin-top: 50px;
+    border-radius: 8px;
+    
+  }
+  
+  .flex-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }

@@ -1,0 +1,7 @@
+venv
+SistemaTCC.egg-info
+teste
+.idea
+sistemaTCC/__pycache__
+sistemaTCC/ext/__pycache__
+__pycache__

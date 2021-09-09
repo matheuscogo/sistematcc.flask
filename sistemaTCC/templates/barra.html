@@ -1,0 +1,33 @@
+{% block style %}
+<link rel="stylesheet" href="../static/css/barra.css">
+{% endblock %}
+
+{% block barra %}
+<header>
+    <p><a href="/">Sistema de gerenciamento de matrizes</a></p>
+</header>
+<nav>
+    <ul>
+        <li>
+            <input hidden type="radio" name="nav" id="id1">
+            <label for="id1"><a href="matrizes.html">Matrizes</a></label>
+        </li>
+        <li>
+            <input hidden type="radio" name="nav" id="id2">
+            <label for="id2"><a href="registros.html">Página2</a></label>
+        </li>
+        <li>
+            <input hidden type="radio" name="nav" id="id3">
+            <label for="id3"><a href="usuarios.html"></a>Página3</label>
+        </li>
+        <li>
+            <input hidden type="radio" name="nav" id="id4">
+            <label for="id4"><a href="planos.html">Planos</a></label>
+        </li>
+        <li>
+            <input hidden type="radio" name="nav" id="id5">
+            <label for="id5">Página5</label>
+        </li>
+    </ul>
+</nav>
+{% endblock %}

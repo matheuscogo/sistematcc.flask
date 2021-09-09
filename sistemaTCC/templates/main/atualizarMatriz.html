@@ -1,0 +1,15 @@
+{% extends "index.html" %}
+
+{% block matriz %}
+     <h1>{{ title }}</h1>
+     <form method="POST" action="atualizarMatriz">
+          RFID:
+          <select name="id" id="id">
+               {% for matriz in matrizes %}
+               <option value="{{ matriz.id }}">{{ matriz.rfid }}</option>
+               {% endfor %}
+          </select>
+          Quantidade:<input name="quantidade" id="quantidade">
+          <input type="submit" name="atualizarMatriz" id="atualizarMatriz" value="atualizarMatriz">
+     </form>
+{% endblock %}

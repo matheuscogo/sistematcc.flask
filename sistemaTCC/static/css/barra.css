@@ -1,0 +1,58 @@
+aside {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  max-width: 255px;
+  background-color: #363740;
+  color: #DDE2FF;
+}
+main {
+  margin-left: 255px;
+}
+
+
+aside header {
+  display: flex;
+  align-items: center;
+  height: 130px;
+  font-size: 2rem;
+  padding: 5px 32px;
+}
+
+aside nav ul {
+  list-style: none;
+}
+
+aside nav ul li {
+  font-size: 2rem;
+  height: 55px;
+  transition: all 0.4s ease-in-out;
+  cursor: pointer;
+  padding: 18px 32px;
+  position: relative;
+}
+
+aside nav ul li label {
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+  cursor: pointer;
+  height: 100%;
+}
+
+aside nav ul li input[type="radio"]:checked + label::before {
+  content: '';
+  height: 100%;
+  width: 2px;
+  background: #DDE2FF;
+  position: absolute;
+  left: 0;
+}
+
+aside nav ul li:hover {
+  background-color: #9fa2b431;
+}
+
+main {
+  width: 100%;
+}

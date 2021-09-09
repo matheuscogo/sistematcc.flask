@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+   <head>
+        <title>{{ title }}</title>
+        <link rel="stylesheet" href='../static/css/estilos.css'/>
+   </head>
+   <body>
+	   <h1>{{ title }}</h1>
+        <form method="POST" action="cadastrarConfinamento">
+            Matriz:<input id="a" name="a" value="{{mtz.numero}}"> <input type="hidden" id="matriz" name="matriz" value="{{mtz.id}}">
+            Plano:
+            <select name="plano" id="plano">
+               {% for plano in planos %}
+               <option value="{{ plano.id }}">{{ plano.nome }}</option>
+               {% endfor %}
+          </select>
+            Dia da Entrada:<input id="dataEntrada" name="dataEntrada" type="date">
+            <input type="submit" name="cadastrarConfinamento" id="cadastrarConfinamento" value="Cadastrar">
+        </form>
+        {{ retorno }}
+   </body>
+</html>

@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block style %}
+<link rel="stylesheet" href="../../static/css/matrizes.css">
+<link rel="stylesheet" href="../../static/css/styles.css">
+<link rel="stylesheet" href="../../static/css/modal.css">
+
+{% endblock %}
+
+{% block main %}
+<div class="wrapper">
+    <h1>{{ title }}</h1>
+    <button onclick="mostrarModal()">Cadastrar Matriz</button>
+    <table>
+        <th colspan="3">
+            MATRIZES
+        </th>
+        <tr>
+            <td>MATRIZ</td>
+            <td>Nº MATRIZ</td>
+            <td>AÇÃO</td>
+        </tr>
+        {% for matriz in matrizes %}
+        <tr>
+            <td>{{matriz.rfid}}</td>
+            <td>{{matriz.numero}}</td>
+            <td><button id="botao" name="botao" value="{{ matriz.id }}"
+                    onclick="showmodal('{{matriz.id}}')">Detalhes</button></td>
+        </tr>
+        {% endfor %}
+        <tr>
+            <td colspan="3"><a href="/"><button>Voltar</button></a></td>
+        </tr>
+    </table>
+</div>
+
+{% include "main/modals/matrizModal.html" %}
+{% include "main/modals/cadastrarMatrizModal.html" %}
+
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
+<script src="/static/js/main.js"></script>
+<script src="../static/js/matrizModal.js"></script>
+<script src="../static/js/cadastrarMatrizModal.js"></script>
+
+{% endblock %}

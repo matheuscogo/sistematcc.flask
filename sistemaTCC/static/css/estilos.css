@@ -1,0 +1,22 @@
+h1{
+    text-align: center;
+    margin: auto;
+    width: 50%;
+    padding: 10px;
+}
+table, th, td {
+    border: 1px solid black;
+    margin: auto;
+    width: 50%;
+    padding: 10px;
+}
+th, td {
+  padding: 15px;
+  text-align: left;
+}
+.status{
+    background-color: green;
+}
+#status{
+    background-color: green;
+}
