@@ -14,15 +14,19 @@ clean:
 	rm -rf SistemaTCC.egg-info
 	pip install -e .[dev] --upgrade --no-cache
 
+SHELL := /bin/bash
 purge:
 	pip uninstall -e .['dev']
+
+ip = $(shell (echo 192.168.5.1))
+
 
 SHELL := /bin/bash
 db:
 	@( \
 		source venv/bin/activate; \
 		pip install -e .[dev] --upgrade --no-cache; \
-		sqlite_web sistemaTCC/sistemaTCC.db; \
+		sqlite_web sistemaTCC/sistemaTCC.db --host=$(ip); \
 	)
 
 SHELL := /bin/bash
@@ -30,6 +34,5 @@ flask:
 	@( \
 		source venv/bin/activate; \
 		pip install -e .[dev] --upgrade --no-cache; \
-		FLASK_APP=sistemaTCC/app.py FLASK_ENV=development flask run; \
+		FLASK_APP=sistemaTCC/app.py FLASK_ENV=development flask run --host=$(ip); \
 	)
-
