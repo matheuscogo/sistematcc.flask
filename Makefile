@@ -25,7 +25,7 @@ db:
 	@( \
 		source venv/bin/activate; \
 		pip install -e .[dev] --upgrade --no-cache; \
-		sqlite_web thor/sistemaTCC.db --host=$(ip); \
+		sqlite_web src/sistemaTCC.db --host=$(ip); \
 	)
 
 SHELL := /bin/bash
@@ -33,7 +33,7 @@ flask:
 	@( \
 		source venv/bin/activate; \
 		pip install -e .[dev] --upgrade --no-cache; \
-		FLASK_APP=thor/app.py FLASK_ENV=development flask run --host=$(ip); \
+		FLASK_APP=src/app.py FLASK_ENV=development flask run --host=$(ip); \
 	)
 
 SHELL := /bin/bash

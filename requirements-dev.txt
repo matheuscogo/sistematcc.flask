@@ -18,3 +18,4 @@ RPi.GPIO
 pi-rc522
 flask-migrate
 sqlite-web
+flask-restplus
