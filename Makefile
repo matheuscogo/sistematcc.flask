@@ -12,7 +12,6 @@ clean:
 	rm -rf docs/_build
 	rm -rf .pytest_cache
 	rm -rf SistemaTCC.egg-info
-	pip install -e .[dev] --upgrade --no-cache
 
 SHELL := /bin/bash
 purge:
