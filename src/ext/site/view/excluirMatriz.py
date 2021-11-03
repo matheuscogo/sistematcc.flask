@@ -1,6 +1,5 @@
 from flask import render_template
 from flask import Blueprint
-from ...api import rasp
 from ...db import matrizCRUD
 
 bp_excluirMatriz = Blueprint("excluirMatriz", __name__)

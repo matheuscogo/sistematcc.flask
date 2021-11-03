@@ -1,6 +1,5 @@
 from flask import render_template
 from flask import Blueprint
-from ...api import rasp
 
 bp_cadastrarMatriz = Blueprint("cadastrarMatriz", __name__)
 

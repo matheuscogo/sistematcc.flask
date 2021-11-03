@@ -10,31 +10,31 @@ namespace = Namespace('Usuario', description='Usuario')
 
 create_episode_request = namespace.model('Dados para criação de Matrizes', {
     'producer_id': fields.Integer(required=True, description='Identificador do produtor'),
-    'name': fields.String(required=True, description='Nome do episódio'),
-    'url': fields.String(required=True, description='Url do episódio')
+    'name': fields.String(required=True, description='Nome do usuarios'),
+    'url': fields.String(required=True, description='Url do usuarios')
 })
 
 create_episode_response = namespace.model('Resposta da criaçao de Matrizes', {
-    'id': fields.Integer(required=True, description='Identificador único do episódio')
+    'id': fields.Integer(required=True, description='Identificador único do usuarios')
 })
 
 get_episode_response = namespace.model('Resposta pegar Matrizes', {
-    'id': fields.Integer(required=True, description='Identificador único do episódio'),
-    'name': fields.String(required=True, description='Nome do episódio'),
-    'url': fields.String(required=True, description='Url do episódio')
+    'id': fields.Integer(required=True, description='Identificador único do usuarios'),
+    'name': fields.String(required=True, description='Nome do usuarios'),
+    'url': fields.String(required=True, description='Url do usuarios')
 })
 
-list_episodes = namespace.model('Lista de episódios', {
+list_episodes = namespace.model('Lista de usuarioss', {
     'id': fields.Integer(required=True, description='Identificador único do Matrizes'),
-    'name': fields.String(required=True, description='Nome do episódio'),
-    'url': fields.String(required=True, description='Url do episódio')
+    'name': fields.String(required=True, description='Nome do usuarios'),
+    'url': fields.String(required=True, description='Url do usuarios')
 })
 
-list_episodes_response = namespace.model('Resposta da lista de episódios', {
-    'list': fields.Nested(list_episodes, required=True, description='Lista de episódios')
+list_episodes_response = namespace.model('Resposta da lista de usuarioss', {
+    'list': fields.Nested(list_episodes, required=True, description='Lista de usuarioss')
 })
 
-delete_episode_response = namespace.model('Resposta da remocao de episódio', {
+delete_episode_response = namespace.model('Resposta da remocao de usuarios', {
     'removed': fields.Boolean(required=True, description='Indicador de remocao com sucesso')
 })
 
@@ -42,7 +42,7 @@ headers = namespace.parser()
 # Aqui podemos adicionar mais parametros ao headers
 
 
-@namespace.route('/cria', doc={"description": 'Cria um novo episódio'})
+@namespace.route('/cria', doc={"description": 'Cria um novo usuarios'})
 @namespace.expect(headers)
 class CreateEpisode(Resource):
     @namespace.response(200, 'Success')
@@ -51,7 +51,7 @@ class CreateEpisode(Resource):
     @namespace.expect(create_episode_request, validate=True)
     @namespace.marshal_with(create_episode_response)
     def post(self):
-        """Cria novo episódio"""
+        """Cria novo usuarios"""
         session = db.session
         try:
             episode = Matriz().create(
@@ -68,9 +68,9 @@ class CreateEpisode(Resource):
             session.close()
 
 
-@namespace.route('/<int:producer_id>/<int:id>', doc={"description": 'Pega episódio'})
+@namespace.route('/<int:producer_id>/<int:id>', doc={"description": 'Pega usuarios'})
 @namespace.param('producer_id', 'Identificador único do produtor')
-@namespace.param('id', 'Identificador único do episódio')
+@namespace.param('id', 'Identificador único do usuarios')
 @namespace.expect(headers)
 class GetEpisode(Resource):
     @namespace.response(200, 'Success')
@@ -78,7 +78,7 @@ class GetEpisode(Resource):
     @namespace.response(500, 'Server Error')
     @namespace.marshal_with(get_episode_response)
     def get(self, producer_id, id):
-        """Pega episódio"""
+        """Pega usuarios"""
         session = db.session
         try:
             producer = Matriz().fetch(session, producer_id, id)
@@ -93,7 +93,7 @@ class GetEpisode(Resource):
             session.close()
 
 
-@namespace.route('/todos', doc={"description": 'Lista todos os episódios'})
+@namespace.route('/todos', doc={"description": 'Lista todos os usuarioss'})
 @namespace.expect(headers)
 class ListEpisodes(Resource):
     @namespace.response(200, 'Success')
@@ -101,7 +101,7 @@ class ListEpisodes(Resource):
     @namespace.response(500, 'Server Error')
     @namespace.marshal_with(list_episodes_response)
     def get(self):
-        """Lista todos os episódios"""
+        """Lista todos os usuarioss"""
         session = db.session
         try:
             episodes = Matriz().fetch_all(session)
@@ -115,16 +115,16 @@ class ListEpisodes(Resource):
 
 
 @namespace.route('/remove/<int:producer_id>/<int:id>',
-                 doc={"description": 'Apaga episódio'})
+                 doc={"description": 'Apaga usuarios'})
 @namespace.param('producer_id', 'Identificador único do produtor')
-@namespace.param('id', 'Identificador único do episódio')
+@namespace.param('id', 'Identificador único do usuarios')
 @namespace.expect(headers)
 class DeleteProducers(Resource):
     @namespace.response(200, 'Success')
     @namespace.response(500, 'Server Error')
     @namespace.marshal_with(delete_episode_response)
     def delete(self, producer_id, id):
-        """Remove episódio"""
+        """Remove usuarios"""
         session = db.session
         try:
             removed = Matriz().delete(session, producer_id, id)

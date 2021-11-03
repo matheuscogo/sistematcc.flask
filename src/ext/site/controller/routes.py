@@ -2,9 +2,7 @@ from flask import render_template, request, Blueprint, redirect
 from ..model.Matriz import Matriz
 from ..model.Plano import Plano
 from ...db import matrizCRUD, planosCRUD, confinamentoCRUD
-from ...api import rasp
-from ...api.rasp import GPIO
-import json
+
 
 bp_controller = Blueprint('routes', __name__)
 
