@@ -46,9 +46,11 @@ def excluirMatriz(id):  # Delete
 def consultarMatriz(id):  # Read
     try:
         matriz = db.session.query(Matriz.Matriz).filter_by(id=id).first()
-        return matriz
-    except:
-        return False
+        if not matriz:
+            raise Exception("")
+        return {"id":matriz.id, "rfid": matriz.rfid, "numero":matriz.numero, "ciclos":matriz.ciclos}
+    except Exception as e:
+        return e.args[0]
     
 def consultarMatrizRFID(rfid):  # Read
     try:

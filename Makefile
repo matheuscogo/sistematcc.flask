@@ -17,7 +17,7 @@ SHELL := /bin/bash
 purge:
 	pip uninstall -e .['dev']
 
-ip = $(shell (echo 192.168.5.1))
+ip = $(shell (echo 192.168.0.105))
 
 
 SHELL := /bin/bash
