@@ -1,4 +1,4 @@
-from ...db import db
+from ...db import db, ma
 from .Confinamento import association_table
 
 class Matriz(db.Model):
@@ -11,3 +11,8 @@ class Matriz(db.Model):
     
     def __repr__(self):
         return '<Matriz {}>'.format(self.rfid)
+
+class MatrizSchema(ma.SQLAlchemyAutoSchema):
+    class Meta:
+        model = Matriz
+        include_fk = False

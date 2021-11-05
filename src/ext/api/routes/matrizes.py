@@ -1,3 +1,4 @@
+from ext.site.model.Matriz import Matriz
 from ...db import db, matrizCRUD
 from flask_restx import Api
 from flask_restx import Namespace, Resource, fields

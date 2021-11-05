@@ -1,5 +1,6 @@
 from ..site.model import Matriz
-from ..db import db
+from ..site.model.Matriz import MatrizSchema
+from ..db import db, ma
 
 def cadastrarMatriz(matriz):  # Create
     try:
@@ -48,7 +49,8 @@ def consultarMatriz(id):  # Read
         matriz = db.session.query(Matriz.Matriz).filter_by(id=id).first()
         if not matriz:
             raise Exception("")
-        return {"id":matriz.id, "rfid": matriz.rfid, "numero":matriz.numero, "ciclos":matriz.ciclos}
+        matriz_schema = MatrizSchema()
+        return MatrizSchema().dump(matriz)
     except Exception as e:
         return e.args[0]
     

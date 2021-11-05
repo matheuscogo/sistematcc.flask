@@ -5,3 +5,7 @@ teste
 sistemaTCC/__pycache__
 sistemaTCC/ext/__pycache__
 __pycache__
+.vscode
+.vscode/configurationCache.log
+.vscode/dryrun.log
+.vscode/targets.log
