@@ -1,5 +1,4 @@
 from ...db import db, ma
-from .Confinamento import association_table
 
 class Registro(db.Model):
     __tablename__ = "registros"

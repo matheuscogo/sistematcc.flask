@@ -1,5 +1,4 @@
 from ...db import db, ma
-from .Confinamento import association_table
 
 class Matriz(db.Model):
     __tablename__ = "matrizes"

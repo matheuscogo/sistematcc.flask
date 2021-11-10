@@ -1,35 +1,62 @@
-from ..site.model.Confinamento import association_table
+from ..site.model import Confinamento
+from ..site.model.Confinamento import ConfinamentoSchema
+from ..db import db
+import datetime
+from werkzeug.wrappers import Response, Request
+import json
 from ..site.model import Dias
 from ..site.model import Plano
 from ..site.model import Matriz
 from ..site.model import Registro
 from ..db import db
 from sqlalchemy.sql import func
-import datetime
 
-
-def cadastrarConfinamento(request):  # Create
+def cadastrarConfinamento(args):  # Create
     try:
-        dataEntrada = str(request.form.get("dataEntrada"))
-        matriz = int(request.form.get("matriz"))
-        plano = int(request.form.get("plano"))
-        db.session.execute(association_table.insert().values(
-            matriz=matriz, plano=plano, dataEntrada=dataEntrada))
+        dataConfinamento = str(args['dataConfinamento'])
+        matriz = int(args['matriz'])
+        plano = int(args['plano'])
+        db.session.add(Confinamento.Confinamento(
+            matriz=matriz,
+            dataConfinamento=dataConfinamento,            
+            plano=plano
+        ))
         db.session.commit()
-        return True
+        return Response(response=json.dumps("{success: true, message: Confinamento cadastrado com sucesso!, response: null}"), status=200)
     except BaseException as e:
-        return False
+        return Response(response=json.dumps("{success: false, message: " + e.args[0] + ", response: null}"), status=501)
 
 
-def consultarConfinamento(rfid):  # Read
+def consultarConfinamento(matriz):  # Read
     try:
-        matriz = db.session.query(
-            Matriz.Matriz.id).filter_by(rfid=rfid).first()[0]
-        confinamento = db.session.query(
-            association_table).filter_by(matriz=matriz).all()[0]
-        return confinamento
+        confinamento = db.session.query(Confinamento).filter_by(matriz=matriz).first()
+        return ConfinametoSchema().dump(confinamento)
     except BaseException as e:
         return str(e)
+
+def atualizarConfinamento(args):
+    try:
+        id = args['id']
+        dataConfinamento = args['dataConfinamento']
+        plano = args['plano']
+        matriz = args['matriz']
+        confinamento = db.session.query(Confinamento).filter_by(id=id).first()
+        confinamento.dataConfinamento = dataConfinamento
+        confinamento.matriz = matriz
+        confinamento.plano = plano
+        db.session.commit()
+        return Response(response=json.dumps("{success: true, message: Confinamento atualizado com sucesso!, response: null}"), status=200)
+    except BaseException as e:
+        return Response(response=json.dumps("{success: false, message: " + e.args[0] + ", response: null}"), status=501)
+
+def excluirConfinamento(id):  # Delete
+    try:
+        confinameto = db.session.query(Confinamento).filter_by(id=id).first()
+        db.session.delete(confinameto)
+        db.session.commit()
+        return Response(response=json.dumps("{success: true, message: Confinameto excluido com sucesso!, response: null}"), status=200)
+    except BaseException as e:
+        return Response(response=json.dumps("{success: false, message: "+ e.args[0] +", response: null}"), status=501)
 
 
 def consultarQuantidade(rfid, dataEntrada):

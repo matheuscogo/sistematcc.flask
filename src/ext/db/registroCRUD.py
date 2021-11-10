@@ -39,7 +39,7 @@ def consultarRegistros():  # Read
 
 def consultarRegistro(id): # Read
     try:
-        registro = db.session.query(Registro.Registro).filter_by(id=id).all()
+        registro = db.session.query(Registro.Registro).filter_by(id=id).first()
         if not registro:
             raise BaseException("Erro ao cadastrar no banco")
         return  RegistroSchema().dump(registro)

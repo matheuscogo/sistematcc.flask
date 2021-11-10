@@ -12,7 +12,7 @@ api = Api(
 matrizes.bind_with_api(api)
 planos.bind_with_api(api)
 registros.bind_with_api(api)
-# confinamento.bind_with_api(api)
+confinamento.bind_with_api(api)
 dias.bind_with_api(api)
 # usuarios.bind_with_api(api)
 
