@@ -1,20 +1,24 @@
-from ext.site.model.Matriz import Matriz
+from ext.site.model.Matriz import Matriz, MatrizSchema
 from ...db import db, matrizCRUD
-from flask_restx import Api
-from flask_restx import Namespace, Resource, fields
+from flask_restx import Api, Namespace, Resource, fields, reqparse
 from werkzeug.exceptions import HTTPException
 from werkzeug.exceptions import NotFound
 from werkzeug.exceptions import InternalServerError
+import json
 
 namespace = Namespace(name='Matrizes', description='Matrizes', path='/matrizes')
 
-create_matriz = namespace.model('Dados para criação de Matrizes', {
-    'rfid': fields.Integer(required=True, description='RFID'),
-    'numero': fields.String(required=True, description='Número da matriz')
+insert_matriz = namespace.model('Dados para criação de uma matriz', {
+    'rfid': fields.String(required=True, description='RFID'),
+    'numero': fields.Integer(required=True, description='Número da matriz'),
+    'ciclos': fields.Integer(required=True, description='Ciclos da matriz')
 })
 
-get_matriz = namespace.model('Consulta de matriz', {
-    'id': fields.Integer(required=True, description='ID da matriz')
+update_matriz = namespace.model('Dados para atualização de matrizes', {
+    'id': fields.Integer(required=True, description='ID da matriz'),
+    'rfid': fields.String(required=True, description='RFID'),
+    'numero': fields.Integer(required=True, description='Número da matriz'),
+    'ciclos': fields.Integer(required=True, description='Ciclos da matriz')
 })
 
 get_episode_response = namespace.model('Resposta pegar Matrizes', {
@@ -23,14 +27,16 @@ get_episode_response = namespace.model('Resposta pegar Matrizes', {
     'url': fields.String(required=True, description='Url do matrizes')
 })
 
-list_episodes = namespace.model('Lista de matrizess', {
-    'id': fields.Integer(required=True, description='Identificador único do Matrizes'),
-    'name': fields.String(required=True, description='Nome do matrizes'),
-    'url': fields.String(required=True, description='Url do matrizes')
+list_matrizes = namespace.model('Lista de matrizes', {
+    'id': fields.String(required=True, description='Identificadores das matrizes'),
+    'rfid': fields.String(description='RFID das matrizes'),
+    'numero': fields.String(description='Numero das matrizes'),
+    'ciclos': fields.String(description='Ciclos das matrizes')
+    
 })
 
-list_episodes_response = namespace.model('Resposta da lista de matrizess', {
-    'list': fields.Nested(list_episodes, required=True, description='Lista de matrizess')
+list_matrizes_response = namespace.model('Resposta da lista de matrizes', {
+    'data': fields.Nested(list_matrizes, required=True, description='Lista de matrizes')
 })
 
 delete_episode_response = namespace.model('Resposta da remocao de matrizes', {
@@ -40,19 +46,43 @@ delete_episode_response = namespace.model('Resposta da remocao de matrizes', {
 headers = namespace.parser()
 # Aqui podemos adicionar mais parametros ao headers
 
-@namespace.route('/create')
+@namespace.route('/insert')
 @namespace.expect(headers)
-@namespace.param('body')
-class CreateEpisode(Resource):
-    @namespace.expect(create_matriz, validate=True)
+class CreateMatriz(Resource):
+    @namespace.expect(insert_matriz, validate=True)
     def post(self):
-        """Cadastra uma nova matriz"""
+        """Cadastra uma matriz"""
         try:
-            return '{"teste": "teste"}'
-            #return matrizCRUD.cadastrarMatriz(create_matriz)
+            parser = reqparse.RequestParser()
+            parser.add_argument('numero', type=int)
+            parser.add_argument('rfid', type=str)
+            parser.add_argument('ciclos', type=int)
+            args = parser.parse_args()
+            matriz = matrizCRUD.cadastrarMatriz(args)
+            if not matriz:
+                raise Exception("Error")
+            return matriz
         except Exception as e:
             raise InternalServerError(e.args[0])
-        finally:
+
+@namespace.route('/update/')
+@namespace.expect(headers)
+class UpdateMatriz(Resource):
+    @namespace.expect(update_matriz, validate=True)
+    def put(self):
+        """Atualiza uma matriz"""
+        try:
+            parser = reqparse.RequestParser()
+            parser.add_argument('id', type=int)
+            parser.add_argument('numero', type=int)
+            parser.add_argument('rfid', type=str)
+            parser.add_argument('ciclos', type=int)
+            args = parser.parse_args()
+            matriz = matrizCRUD.atualizarMatriz(args)
+            if not matriz:
+                raise Exception("Error")
+            return matriz
+        except Exception as e:
             raise InternalServerError(e.args[0])
 
 @namespace.route('/<int:id>')
@@ -68,41 +98,30 @@ class GetMatriz(Resource):
             raise InternalServerError(e.args[0])
 
 
-@namespace.route('/get', doc={"description": 'Lista todos os matrizess'})
+@namespace.route('/', doc={"description": 'Lista todos os matrizes'})
 @namespace.expect(headers)
-class ListEpisodes(Resource):
-    @namespace.response(200, 'Success')
-    @namespace.response(404, 'Not Found Error')
-    @namespace.response(500, 'Server Error')
-    @namespace.marshal_with(list_episodes_response)
+class ListaMatrizes(Resource):
+    @namespace.marshal_with(list_matrizes_response)
     def get(self):
         """Lista todos os matrizess"""
-        session = db.session
         try:
-            return ""
+            matrizes = matrizCRUD.consultarMatrizes()
+            return {"data": matrizes}
         except HTTPException as e:
-            raise e
-        except Exception as e:
             raise InternalServerError(e.args[0])
-        finally:
-            session.close()
 
 
-@namespace.route('/remove/<int:id>',
+@namespace.route('/delete/<int:id>',
                  doc={"description": 'Apaga matrizes'})
 @namespace.param('id', 'ID da matriz')
 @namespace.expect(headers)
-class DeleteProducers(Resource):
-    @namespace.response(200, 'Success')
-    @namespace.response(500, 'Server Error')
-    @namespace.marshal_with(delete_episode_response)
-    def delete(self, producer_id, id):
+class DeleteMatriz(Resource):
+    def delete(self, id):
         """Remove matrizes"""
         try:
-            return ""
+            matriz = matrizCRUD.excluirMatriz(id)
+            return matriz
         except Exception as e:
-            raise InternalServerError(e.args[0])
-        finally:
             raise InternalServerError(e.args[0])
 
 def bind_with_api(api: Api):

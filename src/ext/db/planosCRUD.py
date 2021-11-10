@@ -1,109 +1,77 @@
 from ..site.model import Plano, Dias
+from ..site.model.Plano import PlanoSchema
 from ..db import db
+from werkzeug.wrappers import Response, Request
 import json
 
-
-def cadastrarPlano(plano, json_str):  # Create
+def cadastrarPlano(args):  # Create
     try:
-        if exists(plano.nome):
-            db.session.add(plano)
-            db.session.commit()
-            json_list = list(json.loads(json_str)['plano'])
-            for dados in json_list:
-                dias = list(dados["dias"])
-                quantidade = list()
-                quantidade.append(dados["quantidade"])
-                cont = 0
-                for cont in range(dias[0], dias[1] + 1):
-                    print("TO NO CADASTRA PLANO NO CRUD")
-                    print("Dia " + str(cont) + ": " +
-                      str(cont) + " -> " + str(quantidade[0]))
-                    db.session.add(Dias.Dias(plano=int(db.session.query(Plano.Plano.id).filter_by(
-                        nome=plano.nome).first()[0]), dia=int(cont), quantidade=int(quantidade[0])))
-                    db.session.commit()
-                    cont = cont + 1
-            return ""
-        else:
-            return ""
+        nome = args['nome']
+        descricao = args['descricao']
+        tipo = args['tipo']
+        quantidadeDias = args['quantidadeDias']
+        ativo = True
+        db.session.add(Plano.Plano(
+            nome=nome,
+            descricao=descricao,
+            tipo=tipo,
+            quantidadeDias=quantidadeDias,
+            ativo=ativo)
+        )
+        db.session.commit()
+        return Response(response=json.dumps("{success: true, message: Plano cadastrado com sucesso!, response: null}"), status=200)
     except BaseException as e:
-        return "Deu erro no crud"
+        return Response(response=json.dumps("{success: false, message: " + e.args[0] + ", response: null}"), status=501)
 
 
 def consultarPlanos():  # Read
     try:
-        plano = db.session.query(Plano.Plano).all()
-        return plano
+        planos = db.session.query(Plano.Plano).all()
+        return planos
     except BaseException as e:
-        return False
-
-
-def atualizarPlano(request):  # Update
-    try:
-        matriz = db.session.query(Plano.Plano).filter_by(
-            id=request.form.get("id")).first()
-        matriz.quantidade = request.form.get("quantidade")
-        db.session.commit()
-        return True
-    except BaseException as e:
-        return False
-
-
-def excluirPlano(plano):  # Delete
-    try:
-        plano = db.session.query(Plano.Plano).filter_by(id=plano).first()
-        db.session.delete(plano)
-        db.session.commit()
-        return True
-    except BaseException as e:
-        return False
-
-
-def exists(nome):
-    exists = db.session.query(db.exists().where(
-        Plano.Plano.nome == nome)).scalar()
-    print(str(exists))
-    if exists:
-        return False
-    else:
-        return True
-
-
-def consultarPlano(id):
+        return Response(response=json.dumps("{success: false, message: " + e.args[0] + ", response: null}"), status=501)
+    
+def consultarPlano(id): # Read
     try:
         plano = db.session.query(Plano.Plano).filter_by(id=id).first()
-        return plano
-    except:
-        return False
+        return PlanoSchema().dump(plano)
+    except Exception as e:
+        return Response(response=json.dumps("{success: false, message: " + e.args[0] + ", response: null}"), status=501)
 
-
-def consultarDias():  # Read
+def atualizarPlano(args):  # Update
     try:
-        dias = db.session.query(Dias.Dias).all()
-        return dias
-    except BaseException as e:
-        return False
+        id = int(args['id'])
+        nome = str(args['nome'])
+        descricao = str(args['descricao'])
+        tipo = int(args['tipo'])
+        quantidadeDias = int(args['quantidadeDias'])
+        ativo = args['ativo']
 
-
-def atualizarDias(request):  # Update
-    try:
-        matriz = db.session.query(Plano.Plano).filter_by(
-            id=request.form.get("id")).first()
-        matriz.quantidade = request.form.get("quantidade")
+        if(ativo == "true"):
+            ativo = True
+        else:
+            ativo = False
+        
+        plano = db.session.query(Plano.Plano).filter_by(id=id).first()
+        plano.nome = nome
+        plano.descricao = descricao
+        plano.tipo = tipo
+        plano.quantidadeDias = quantidadeDias
+        plano.ativo = ativo
         db.session.commit()
-        return True
+        return Response(response=json.dumps("{success: true, message: Plano atualizado com sucesso!, response: null}"), status=200)
     except BaseException as e:
-        return False
+        return Response(response=json.dumps("{success: false, message: " + e.args[0] + ", response: null}"), status=501)
 
 
-def excluirDia(plano):  # Delete
+def excluirPlano(id):  # Delete
     try:
-        plano = db.session.query(Plano.Plano).filter_by(id=plano).first()
+        plano = db.session.query(Plano.Plano).filter_by(id=id).first()
         db.session.delete(plano)
         db.session.commit()
-        return True
+        return Response(response=json.dumps("{success: true, message: Plano excluido com sucesso!, response: null}"), status=200)
     except BaseException as e:
-        return False
-
+        return Response(response=json.dumps("{success: false, message: "+ e.args[0] +", response: null}"), status=501)
 
 def exists(nome):
     exists = db.session.query(db.exists().where(
@@ -113,15 +81,6 @@ def exists(nome):
         return False
     else:
         return True
-
-
-def consultarDia(id):
-    try:
-        dia = db.session.query(Dias.Dias).filter_by(plano=id).all()
-        return dia
-    except:
-        return False
-
 
 def consultarQuantidade(id):
     try:

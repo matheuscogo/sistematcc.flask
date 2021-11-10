@@ -8,9 +8,17 @@ class Matriz(db.Model):
     rfid = db.Column("rfid", db.VARCHAR)
     numero = db.Column("numero", db.Integer)
     ciclos = db.Column("ciclos", db.Integer)
-    
-    def __repr__(self):
-        return '<Matriz {}>'.format(self.rfid)
+
+    def __init__(
+        id = id,
+        rfid = rfid,
+        numero = numero,
+        ciclos = ciclos
+    ):
+        Matriz.id = id
+        Matriz.rfid = rfid
+        Matriz.numero = numero
+        Matriz.ciclos = ciclos
 
 class MatrizSchema(ma.SQLAlchemyAutoSchema):
     class Meta:

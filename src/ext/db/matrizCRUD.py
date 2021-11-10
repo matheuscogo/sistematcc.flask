@@ -1,38 +1,52 @@
 from ..site.model import Matriz
 from ..site.model.Matriz import MatrizSchema
-from ..db import db, ma
+from ..db import db
+from werkzeug.wrappers import Response, Request
+import json
 
-def cadastrarMatriz(matriz):  # Create
+def cadastrarMatriz(args):  # Create
     try:
-        if existsRFID(matriz.rfid):
-            if existsNumero(matriz.numero):
-                db.session.add(matriz)
-                db.session.commit()
-                return True
-            else:
-                return False
-        else:
-            return "RFID já cadastrado!"
+        numero = int(args['numero'])
+        rfid = args['rfid']
+        ciclos = int(args['ciclos'])
+        db.session.add(Matriz.Matriz(rfid=rfid, numero=numero, ciclos=ciclos))
+        db.session.commit()
+        return Response(response=json.dumps("{success: true, message: Matriz cadastrada com sucesso!, response: null}"), status=200)
     except BaseException as e:
-        return False
-
+        return Response(response=json.dumps("{success: false, message: "+ e.args[0] +", response: null}"), status=501)
 
 def consultarMatrizes():  # Read
     try:
         matrizes = db.session.query(Matriz.Matriz).all()
         return matrizes
     except BaseException as e:
-        return str(e)
+        return Response(response=json.dumps("{success: false, message: "+ e.args[0] +", response: null}"), status=501)
 
 
-def atualizarMatriz(request):  # Update
+def consultarMatriz(id):  # Read
     try:
-        matriz = db.session.query(Matriz.Matriz).filter_by(id=request.form.get("id")).first()
-        matriz.quantidade = request.form.get("quantidade")
+        matriz = db.session.query(Matriz.Matriz).filter_by(id=id).first()
+        if not matriz:
+            raise Exception(MatrizSchema().dump(matriz))
+        return MatrizSchema().dump(matriz)
+    except Exception as e:
+        return e.args[0]
+
+    
+def atualizarMatriz(args):  # Update
+    try:
+        id=int(args['id'])
+        rfid=str(args['rfid'])
+        numero=int(args['numero'])
+        ciclos=int(args['ciclos'])
+        matriz = db.session.query(Matriz.Matriz).filter_by(id=id).first()
+        matriz.rfid = rfid
+        matriz.numero = numero
+        matriz.ciclos = ciclos
         db.session.commit()
-        return True
+        return Response(response=json.dumps("{success: true, message: Matriz atualizada com sucesso!, response: null}"), status=200)
     except BaseException as e:
-        return False
+        return Response(response=json.dumps("{success: false, message: " + e.args[0] + ", response: null}"), status=501)
 
 
 def excluirMatriz(id):  # Delete
@@ -40,26 +54,16 @@ def excluirMatriz(id):  # Delete
         matriz = db.session.query(Matriz.Matriz).filter_by(id=id).first()
         db.session.delete(matriz)
         db.session.commit()
-        return True
+        return Response(response=json.dumps("{success: true, message: Matriz excluida com sucesso!, response: null}"), status=200)
     except BaseException as e:
-        return False
-    
-def consultarMatriz(id):  # Read
-    try:
-        matriz = db.session.query(Matriz.Matriz).filter_by(id=id).first()
-        if not matriz:
-            raise Exception("")
-        matriz_schema = MatrizSchema()
-        return MatrizSchema().dump(matriz)
-    except Exception as e:
-        return e.args[0]
+        return Response(response=json.dumps("{success: false, message: "+ e.args[0] +", response: null}"), status=501)
     
 def consultarMatrizRFID(rfid):  # Read
     try:
         matriz = db.session.query(Matriz.Matriz).filter_by(rfid=rfid).first()
         return matriz
-    except:
-        return False
+    except Exception as e:
+        return e.args[0]
     
 def existsRFID(rfid):
     exists = db.session.query(db.exists().where(Matriz.Matriz.rfid == rfid)).scalar()
@@ -76,7 +80,7 @@ def existsNumero(numero):
     else:
         return True
     
-def consultarMatrizID(rfid):  # Read
+def consultarMatrizRFID(rfid):  # Read
     try:
         matriz = db.session.query(Matriz.Matriz.id).filter_by(rfid=rfid).first()
         a = str(matriz).replace(", )", "")

@@ -1,140 +1,139 @@
-from ...db import db
-from flask_restx import Api
-from flask_restx import Namespace, Resource, fields
-from ext.site.model.Matriz import Matriz
+from ext.site.model.Registro import Registro, RegistroSchema
+from ...db import registroCRUD
+from flask_restx import Api, Namespace, Resource, fields, reqparse
 from werkzeug.exceptions import HTTPException
 from werkzeug.exceptions import NotFound
 from werkzeug.exceptions import InternalServerError
+import json
 
-namespace = Namespace('Registros', description='Registros')
+namespace = Namespace(name='Registros', description='Registros', path='/registros')
 
-create_episode_request = namespace.model('Dados para criação de Matrizes', {
-    'producer_id': fields.Integer(required=True, description='Identificador do produtor'),
-    'name': fields.String(required=True, description='Nome do registros'),
-    'url': fields.String(required=True, description='Url do registros')
+insert_registro = namespace.model('Dados para criação de um registro', {
+    'matriz': fields.Integer(required=True, description='FK da matriz'),
+    'dataEntrada': fields.String(required=True, description='Dia da entrada da matriz no alimentador'),
+    'dataSaida': fields.String(required=True, description='Dia da saida da matriz no alimentador'),
+    'horaEntrada': fields.String(required=True, description='Hora de entrada da matriz no alimentador'),
+    'horaSaida': fields.String(required=True, description='Hora de saida da matriz no alimentador'),
+    'tempo': fields.String(required=True, description='Tempo que a matriz permaneceu no confinamento'),
+    'quantidade': fields.Integer(required=True, description='Quantidade de ração consumida pela matriz')
 })
 
-create_episode_response = namespace.model('Resposta da criaçao de Matrizes', {
-    'id': fields.Integer(required=True, description='Identificador único do registros')
+update_registro = namespace.model('Dados para atualização de um registro', {
+    'id': fields.Integer(required=True, description='ID do registro'),
+    'matriz': fields.Integer(required=True, description='FK da matriz'),
+    'dataEntrada': fields.String(required=True, description='Dia da entrada da matriz no alimentador'),
+    'dataSaida': fields.String(required=True, description='Dia da saida da matriz no alimentador'),
+    'horaEntrada': fields.String(required=True, description='Hora de entrada da matriz no alimentador'),
+    'horaSaida': fields.String(required=True, description='Hora de saida da matriz no alimentador'),
+    'tempo': fields.String(required=True, description='Tempo que a matriz permaneceu no confinamento'),
+    'quantidade': fields.Integer(required=True, description='Quantidade de ração consumida pela matriz')
 })
 
-get_episode_response = namespace.model('Resposta pegar Matrizes', {
-    'id': fields.Integer(required=True, description='Identificador único do registros'),
-    'name': fields.String(required=True, description='Nome do registros'),
-    'url': fields.String(required=True, description='Url do registros')
+list_registros = namespace.model('Lista de registros', {
+    'id': fields.Integer(required=True, description='ID do registro'),
+    'matriz': fields.Integer(required=True, description='FK da matriz'),
+    'dataEntrada': fields.String(required=True, description='Dia da entrada da matriz no alimentador'),
+    'dataSaida': fields.String(required=True, description='Dia da saida da matriz no alimentador'),
+    'horaEntrada': fields.String(required=True, description='Hora de entrada da matriz no alimentador'),
+    'horaSaida': fields.String(required=True, description='Hora de saida da matriz no alimentador'),
+    'tempo': fields.String(required=True, description='Tempo que a matriz permaneceu no confinamento'),
+    'quantidade': fields.Integer(required=True, description='Quantidade de ração consumida pela matriz')
 })
 
-list_episodes = namespace.model('Lista de registross', {
-    'id': fields.Integer(required=True, description='Identificador único do Matrizes'),
-    'name': fields.String(required=True, description='Nome do registros'),
-    'url': fields.String(required=True, description='Url do registros')
-})
-
-list_episodes_response = namespace.model('Resposta da lista de registross', {
-    'list': fields.Nested(list_episodes, required=True, description='Lista de registross')
-})
-
-delete_episode_response = namespace.model('Resposta da remocao de registros', {
-    'removed': fields.Boolean(required=True, description='Indicador de remocao com sucesso')
+list_registros_response = namespace.model('Resposta da lista de registros', {
+    'data': fields.Nested(list_registros, required=True, description='Lista de registros')
 })
 
 headers = namespace.parser()
 # Aqui podemos adicionar mais parametros ao headers
 
-
-@namespace.route('/cria', doc={"description": 'Cria um novo registros'})
+@namespace.route('/insert')
 @namespace.expect(headers)
-class CreateEpisode(Resource):
-    @namespace.response(200, 'Success')
-    @namespace.response(400, 'Request Error')
-    @namespace.response(500, 'Server Error')
-    @namespace.expect(create_episode_request, validate=True)
-    @namespace.marshal_with(create_episode_response)
+class CreateRegistro(Resource):
+    @namespace.expect(insert_registro, validate=True)
     def post(self):
-        """Cria novo registros"""
-        session = db.session
+        """Cadastra um registro"""
         try:
-            episode = Matriz().create(
-                session,
-                producer_id=namespace.payload['producer_id'],
-                name=namespace.payload['name'],
-                url=namespace.payload['url']
-            )
-            session.commit()
-            return {'id': episode.id}
+            parser = reqparse.RequestParser()
+            parser.add_argument('matriz', type=int)
+            parser.add_argument('dataEntrada', type=str)
+            parser.add_argument('dataSaida', type=str)
+            parser.add_argument('horaEntrada', type=str)
+            parser.add_argument('horaSaida', type=str)
+            parser.add_argument('tempo', type=str)
+            parser.add_argument('quantidade', type=int)
+            args = parser.parse_args()
+            registro = registroCRUD.cadastrarRegistro(args)
+            if not registro:
+                raise Exception("Error")
+            return registro
         except Exception as e:
             raise InternalServerError(e.args[0])
-        finally:
-            session.close()
 
-
-@namespace.route('/<int:producer_id>/<int:id>', doc={"description": 'Pega registros'})
-@namespace.param('producer_id', 'Identificador único do produtor')
-@namespace.param('id', 'Identificador único do registros')
+@namespace.route('/update/')
 @namespace.expect(headers)
-class GetEpisode(Resource):
-    @namespace.response(200, 'Success')
-    @namespace.response(404, 'Not Found Error')
-    @namespace.response(500, 'Server Error')
-    @namespace.marshal_with(get_episode_response)
-    def get(self, producer_id, id):
-        """Pega registros"""
-        session = db.session
+class UpdateRegistro(Resource):
+    @namespace.expect(update_registro, validate=True)
+    def put(self):
+        """Atualiza um registro"""
         try:
-            producer = Matriz().fetch(session, producer_id, id)
-            if not producer:
-                raise NotFound('Not found producer')
-            return producer
+            parser = reqparse.RequestParser()
+            parser.add_argument('id', type=int)
+            parser.add_argument('matriz', type=int)
+            parser.add_argument('dataEntrada', type=str)
+            parser.add_argument('dataSaida', type=str)
+            parser.add_argument('horaEntrada', type=str)
+            parser.add_argument('horaSaida', type=str)
+            parser.add_argument('tempo', type=str)
+            parser.add_argument('quantidade', type=int)
+            args = parser.parse_args()
+            registro = registroCRUD.atualizarRegistro(args)
+            if not registro:
+                raise Exception("Error")
+            return registro
+        except Exception as e:
+            raise InternalServerError(e.args[0])
+
+@namespace.route('/<int:id>')
+@namespace.param('id')
+@namespace.expect(headers)
+class GetRegistro(Resource):
+    def get(self, id):
+        """Consulta um registro por id"""
+        try:
+            registro = registroCRUD.consultarRegistro(id)
+            return registro
         except HTTPException as e:
-            raise e
-        except Exception as e:
             raise InternalServerError(e.args[0])
-        finally:
-            session.close()
 
 
-@namespace.route('/todos', doc={"description": 'Lista todos os registross'})
+@namespace.route('/', doc={"description": 'Lista todos os matrizes'})
 @namespace.expect(headers)
-class ListEpisodes(Resource):
-    @namespace.response(200, 'Success')
-    @namespace.response(404, 'Not Found Error')
-    @namespace.response(500, 'Server Error')
-    @namespace.marshal_with(list_episodes_response)
+class ListaRegistros(Resource):
+    @namespace.marshal_with(list_registros_response)
     def get(self):
-        """Lista todos os registross"""
-        session = db.session
+        """Lista todos os registros"""
         try:
-            episodes = Matriz().fetch_all(session)
-            return {'list': episodes}
+            registros = registroCRUD.consultarRegistros()
+            if not registros:
+                raise BaseException("Erro ao consultar no banco de dados")
+            return {"data": registros}
         except HTTPException as e:
-            raise e
-        except Exception as e:
             raise InternalServerError(e.args[0])
-        finally:
-            session.close()
 
 
-@namespace.route('/remove/<int:producer_id>/<int:id>',
-                 doc={"description": 'Apaga registros'})
-@namespace.param('producer_id', 'Identificador único do produtor')
-@namespace.param('id', 'Identificador único do registros')
+@namespace.route('/delete/<int:id>',
+                 doc={"description": 'Apaga um registro'})
+@namespace.param('id', 'ID do registro')
 @namespace.expect(headers)
-class DeleteProducers(Resource):
-    @namespace.response(200, 'Success')
-    @namespace.response(500, 'Server Error')
-    @namespace.marshal_with(delete_episode_response)
-    def delete(self, producer_id, id):
-        """Remove registros"""
-        session = db.session
+class DeleteRegistro(Resource):
+    def delete(self, id):
+        """Remove um registro"""
         try:
-            removed = Matriz().delete(session, producer_id, id)
-            session.commit()
-            return {'removed': removed}
+            registro = registroCRUD.excluirRegistro(id)
+            return registro
         except Exception as e:
             raise InternalServerError(e.args[0])
-        finally:
-            session.close()
-
 
 def bind_with_api(api: Api):
     """

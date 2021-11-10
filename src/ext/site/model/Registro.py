@@ -1,4 +1,4 @@
-from ...db import db
+from ...db import db, ma
 from .Confinamento import association_table
 
 class Registro(db.Model):
@@ -11,6 +11,28 @@ class Registro(db.Model):
     horaSaida = db.Column("horaSaida", db.VARCHAR)
     tempo = db.Column("tempo", db.VARCHAR)
     quantidade = db.Column("quantidade", db.Integer)
-    
-    def __repr__(self):
-        return '<Registro {}>'.format(self.matriz)
+
+    def __init__(
+        id = id,
+        matriz = matriz,
+        dataEntrada = dataEntrada,
+        dataSaida = dataSaida,
+        horaEntrada = horaEntrada,
+        horaSaida = horaSaida,
+        tempo = tempo,
+        quantidade = quantidade
+    ):
+        Registro.id = id
+        Registro.matriz = matriz
+        Registro.dataEntrada = dataEntrada
+        Registro.dataSaida = dataSaida
+        Registro.dataSaida = dataSaida
+        Registro.horaEntrada = horaEntrada
+        Registro.horaSaida = horaSaida
+        Registro.tempo = tempo
+        Registro.quantidade = quantidade
+
+class RegistroSchema(ma.SQLAlchemyAutoSchema):
+    class Meta:
+        model = Registro
+        include_fk = False

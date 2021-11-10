@@ -1,4 +1,4 @@
-from ...db import db
+from ...db import db, ma
 
 class Plano(db.Model):
     __tablename__ = "planos"
@@ -10,5 +10,22 @@ class Plano(db.Model):
     quantidadeDias = db.Column("quantidadeDias", db.Integer)
     ativo = db.Column("ativo", db.Boolean)
 
-    def __repr__(self):
-        return '<Plano %r>' % self.id
+    def __init__(
+        id = id,
+        nome = nome,
+        descricao = descricao,
+        tipo = tipo,
+        quantidadeDias = quantidadeDias,
+        ativo = ativo
+    ):
+        Plano.id = id
+        Plano.nome = nome
+        Plano.descricao = descricao
+        Plano.tipo = tipo
+        Plano.quantidadeDias = quantidadeDias
+        Plano.ativo = ativo
+
+class PlanoSchema(ma.SQLAlchemyAutoSchema):
+    class Meta:
+        model = Plano
+        include_fk = False

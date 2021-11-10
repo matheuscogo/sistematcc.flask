@@ -10,8 +10,8 @@ bp_controller = Blueprint('routes', __name__)
 @bp_controller.route('/cadastrarMatriz', methods=['POST', 'GET'])
 def cadastrarMatriz():  # Cadastrar Matriz
     try:
-        matriz = Matriz(rfid=request.form.get('rfid'),
-                        numero=request.form.get('numero'),
+        matriz = Matriz(rfid="teste",
+                        numero=0,
                         ciclos=0)
         retorno = matrizCRUD.cadastrarMatriz(matriz)
         templateData = {

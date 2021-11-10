@@ -1,140 +1,129 @@
-from ...db import db
-from flask_restx import Api
-from flask_restx import Namespace, Resource, fields
-from ext.site.model.Matriz import Matriz
+from ext.site.model.Matriz import Matriz, MatrizSchema
+from ...db import db, planosCRUD
+from flask_restx import Api, Namespace, Resource, fields, reqparse
 from werkzeug.exceptions import HTTPException
 from werkzeug.exceptions import NotFound
 from werkzeug.exceptions import InternalServerError
+import json
 
-namespace = Namespace('Planos', description='Planos')
+namespace = Namespace(name='Planos de alimentação', description='Planos', path='/planos')
 
-create_episode_request = namespace.model('Dados para criação de Matrizes', {
-    'producer_id': fields.Integer(required=True, description='Identificador do produtor'),
-    'name': fields.String(required=True, description='Nome do plano'),
-    'url': fields.String(required=True, description='Url do plano')
+insert_plano = namespace.model('Dados para criação de um plano', {
+    'nome': fields.String(required=True, description='Nome do plano de alimentação'),
+    'descricao': fields.String(required=True, description='Descrição do plano de alimentação'),
+    'tipo': fields.Integer(required=True, description='Tipo do plano de alimentação'),
+    'quantidadeDias': fields.Integer(required=True, description='Quantidade de dias do plano de alimentação'),
 })
 
-create_episode_response = namespace.model('Resposta da criaçao de Matrizes', {
-    'id': fields.Integer(required=True, description='Identificador único do plano')
+update_plano = namespace.model('Dados para atualização de um plano', {
+    'nome': fields.String(required=True, description='Nome do plano de alimentação'),
+    'descricao': fields.String(required=True, description='Descrição do plano de alimentação'),
+    'tipo': fields.Integer(required=True, description='Tipo do plano de alimentação'),
+    'quantidadeDias': fields.Integer(required=True, description='Quantidade de dias do plano de alimentação'),
+    'ativo': fields.Boolean(required=True, description='Verifica se o plano de alimentação está ativo ou não')
 })
 
-get_episode_response = namespace.model('Resposta pegar Matrizes', {
-    'id': fields.Integer(required=True, description='Identificador único do plano'),
-    'name': fields.String(required=True, description='Nome do plano'),
-    'url': fields.String(required=True, description='Url do plano')
+get_plano_response = namespace.model('Response para plano de alimentação', {
+    'nome': fields.String(required=True, description='Nome do plano de alimentação'),
+    'descricao': fields.String(required=True, description='Descrição do plano de alimentação'),
+    'tipo': fields.Integer(required=True, description='Tipo do plano de alimentação'),
+    'quantidadeDias': fields.Integer(required=True, description='Quantidade de dias do plano de alimentação'),
+    'ativo': fields.Boolean(required=True, description='Verifica se o plano de alimentação está ativo ou não')
 })
 
-list_episodes = namespace.model('Lista de plano', {
-    'id': fields.Integer(required=True, description='Identificador único do Matrizes'),
-    'name': fields.String(required=True, description='Nome do plano'),
-    'url': fields.String(required=True, description='Url do plano')
+list_planos = namespace.model('Lista de planos de alimentação', {
+    'nome': fields.String(required=True, description='Nome do plano de alimentação'),
+    'descricao': fields.String(required=True, description='Descrição do plano de alimentação'),
+    'tipo': fields.Integer(required=True, description='Tipo do plano de alimentação'),
+    'quantidadeDias': fields.Integer(required=True, description='Quantidade de dias do plano de alimentação'),
+    'ativo': fields.Boolean(required=True, description='Verifica se o plano de alimentação está ativo ou não')   
 })
 
-list_episodes_response = namespace.model('Resposta da lista de planos', {
-    'list': fields.Nested(list_episodes, required=True, description='Lista de planos')
-})
-
-delete_episode_response = namespace.model('Resposta da remocao de plano', {
-    'removed': fields.Boolean(required=True, description='Indicador de remocao com sucesso')
+list_planos_response = namespace.model('Response para lista de planos', {
+    'data': fields.Nested(list_planos, required=True, description='Lista de planos de alimentação')
 })
 
 headers = namespace.parser()
 # Aqui podemos adicionar mais parametros ao headers
 
-
-@namespace.route('/cria', doc={"description": 'Cria um novo plano'})
+@namespace.route('/insert')
 @namespace.expect(headers)
-class CreateEpisode(Resource):
-    @namespace.response(200, 'Success')
-    @namespace.response(400, 'Request Error')
-    @namespace.response(500, 'Server Error')
-    @namespace.expect(create_episode_request, validate=True)
-    @namespace.marshal_with(create_episode_response)
+class CreatePlano(Resource):
+    @namespace.expect(insert_plano, validate=True)
     def post(self):
-        """Cria novo plano"""
-        session = db.session
+        """Cadastra uma plano de alimentação"""
         try:
-            episode = Matriz().create(
-                session,
-                producer_id=namespace.payload['producer_id'],
-                name=namespace.payload['name'],
-                url=namespace.payload['url']
-            )
-            session.commit()
-            return {'id': episode.id}
+            parser = reqparse.RequestParser()
+            parser.add_argument('nome', type=str)
+            parser.add_argument('descricao', type=str)
+            parser.add_argument('tipo', type=int)
+            parser.add_argument('quantidadeDias', type=int)
+            args = parser.parse_args()
+            plano = planosCRUD.cadastrarPlano(args)
+            if not plano:
+                raise Exception("Error")
+            return plano
         except Exception as e:
             raise InternalServerError(e.args[0])
-        finally:
-            session.close()
 
-
-@namespace.route('/<int:producer_id>/<int:id>', doc={"description": 'Pega plano'})
-@namespace.param('producer_id', 'Identificador único do produtor')
-@namespace.param('id', 'Identificador único do plano')
+@namespace.route('/update/<int:id>')
 @namespace.expect(headers)
-class GetEpisode(Resource):
-    @namespace.response(200, 'Success')
-    @namespace.response(404, 'Not Found Error')
-    @namespace.response(500, 'Server Error')
-    @namespace.marshal_with(get_episode_response)
-    def get(self, producer_id, id):
-        """Pega plano"""
-        session = db.session
+class UpdatePlano(Resource):
+    @namespace.expect(update_plano, validate=True)
+    def put(self):
+        """Atualiza uma plano"""
         try:
-            producer = Matriz().fetch(session, producer_id, id)
-            if not producer:
-                raise NotFound('Not found producer')
-            return producer
-        except HTTPException as e:
-            raise e
+            parser = reqparse.RequestParser()
+            parser.add_argument('nome', type=str)
+            parser.add_argument('descricao', type=str)
+            parser.add_argument('tipo', type=int)
+            parser.add_argument('quantidadeDias', type=int)
+            args = parser.parse_args()
+            plano = planosCRUD.atualizarPlano(args)
+            if not plano:
+                raise Exception("Error")
+            return plano
         except Exception as e:
             raise InternalServerError(e.args[0])
-        finally:
-            session.close()
+
+@namespace.route('/<int:id>')
+@namespace.param('id')
+@namespace.expect(headers)
+class GetPlano(Resource):
+    def get(self, id):
+        """Consulta um plano por id"""
+        try:
+            plano = planosCRUD.consultarPlano(id)
+            return plano
+        except HTTPException as e:
+            raise InternalServerError(e.args[0])
 
 
-@namespace.route('/todos', doc={"description": 'Lista todos os planos'})
+@namespace.route('/', doc={"description": 'Lista todos os matrizes'})
 @namespace.expect(headers)
 class ListEpisodes(Resource):
-    @namespace.response(200, 'Success')
-    @namespace.response(404, 'Not Found Error')
-    @namespace.response(500, 'Server Error')
-    @namespace.marshal_with(list_episodes_response)
+    @namespace.marshal_with(list_planos_response)
     def get(self):
-        """Lista todos os planos"""
-        session = db.session
+        """Lista todos os planos de alimentação"""
         try:
-            episodes = Matriz().fetch_all(session)
-            return {'list': episodes}
+            planos = planosCRUD.consultarPlanos()
+            return {"data": planos}
         except HTTPException as e:
-            raise e
-        except Exception as e:
             raise InternalServerError(e.args[0])
-        finally:
-            session.close()
 
 
-@namespace.route('/remove/<int:producer_id>/<int:id>',
-                 doc={"description": 'Apaga plano'})
-@namespace.param('producer_id', 'Identificador único do produtor')
-@namespace.param('id', 'Identificador único do plano')
+@namespace.route('/delete/<int:id>',
+                 doc={"description": 'Deleta um plano de alimentação'})
+@namespace.param('id', 'ID da matriz')
 @namespace.expect(headers)
-class DeleteProducers(Resource):
-    @namespace.response(200, 'Success')
-    @namespace.response(500, 'Server Error')
-    @namespace.marshal_with(delete_episode_response)
-    def delete(self, producer_id, id):
-        """Remove plano"""
-        session = db.session
+class DeletePlano(Resource):
+    def delete(self, id):
+        """Remove um plano de alimentação"""
         try:
-            removed = Matriz().delete(session, producer_id, id)
-            session.commit()
-            return {'removed': removed}
+            plano = planosCRUD.excluirPlano(id)
+            return plano
         except Exception as e:
             raise InternalServerError(e.args[0])
-        finally:
-            session.close()
-
 
 def bind_with_api(api: Api):
     """

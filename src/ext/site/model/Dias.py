@@ -1,5 +1,4 @@
-from ...db import db
-from .Plano import Plano
+from ...db import db, ma
 
 class Dias(db.Model):
     __tablename__ = "dias"
@@ -7,8 +6,21 @@ class Dias(db.Model):
     plano = db.Column(db.Integer, db.ForeignKey("planos.id"))
     # plano_relation = db.relationship(Plano)
     dia = db.Column("dia", db.Integer)
-    quantidade = db.Column("quantidade", db.Integer)  
+    quantidade = db.Column("quantidade", db.Integer)
 
+    def __init__(
+        id = id,
+        plano = plano,
+        dia = dia,
+        quantidade = quantidade
+    ):
+        Dias.id = id
+        Dias.plano = plano
+        Dias.dia = dia
+        Dias.quantidade = quantidade  
 
-    def __repr__(self):
-        return '<Dias {}>'.format(self.dias)
+class DiasSchema(ma.SQLAlchemyAutoSchema):
+    class Meta:
+        model = Dias
+        include_fk = False
+
