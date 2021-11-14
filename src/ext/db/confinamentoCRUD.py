@@ -30,7 +30,7 @@ def cadastrarConfinamento(args):  # Create
 def consultarConfinamento(matriz):  # Read
     try:
         confinamento = db.session.query(Confinamento).filter_by(matriz=matriz).first()
-        return ConfinametoSchema().dump(confinamento)
+        return ConfinamentoSchema().dump(confinamento)
     except BaseException as e:
         return str(e)
 

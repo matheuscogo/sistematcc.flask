@@ -1,4 +1,5 @@
-from ext.site.model.Matriz import Matriz, MatrizSchema
+from ...site.model.Plano import PlanoSchema
+from ...site.model import Plano
 from ...db import db, planosCRUD
 from flask_restx import Api, Namespace, Resource, fields, reqparse
 from werkzeug.exceptions import HTTPException
@@ -94,7 +95,7 @@ class GetPlano(Resource):
         """Consulta um plano por id"""
         try:
             plano = planosCRUD.consultarPlano(id)
-            return plano
+            return PlanoSchema().dump(plano)
         except HTTPException as e:
             raise InternalServerError(e.args[0])
 

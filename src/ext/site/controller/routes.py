@@ -1,4 +1,6 @@
+import datetime
 from flask import render_template, request, Blueprint, redirect
+from ext.api import rasp
 from ..model.Matriz import Matriz
 from ..model.Plano import Plano
 from ...db import matrizCRUD, planosCRUD, confinamentoCRUD
@@ -173,7 +175,8 @@ def TESTE():
     from ...db import matrizCRUD, registroCRUD, confinamentoCRUD
     import datetime, time
     from ..model.Registro import Registro
-
+    import RPi.GPIO as GPIO
+    from pirc522 import RFID
     
     bot1 = 37
     bot2 = 35
@@ -195,9 +198,7 @@ def TESTE():
     quantidade = 0
     dataSaida = ""
     horaSaida = ""    
-    
-    registro = Registro()
-        
+            
     while True:
         uid = rasp.leitorRFID()
         entrada = 1
@@ -206,7 +207,7 @@ def TESTE():
                 print('Matriz {} identificada'.format(uid))
                 dataEntrada = str(datetime.datetime.now().strftime("%Y-%m-%d"))
                 horaEntrada = datetime.datetime.now()
-                matriz = matrizCRUD.consultarMatrizID(str(uid))
+                # matriz = matrizCRUD.consultarMatrizID(str(uid))
                 GPIO.output(led3, 1)
                 time.sleep(1)
                 GPIO.output(led3, 0)
@@ -271,3 +272,7 @@ def consultarQuantidade():
 @bp_controller.route('/teste2',)
 def teste2():
     return str(confinamentoCRUD.consultarQuantidade("[160, 45, 156, 43, 58]", "2021-08-08"))
+
+@bp_controller.route('/time')
+def testeTime():
+    return {"time": datetime.datetime.now().strftime("%H:%M:%S")}
