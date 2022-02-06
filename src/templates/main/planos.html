@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block style %}
+<link rel="stylesheet" href="../../static/css/matrizes.css">
+<link rel="stylesheet" href="../../static/css/styles.css">
+<link rel="stylesheet" href="../../static/css/modal.css">
+{% endblock %}
+
+{% block main %}
+<div class="wrapper">
+    <h1>{{ title }}</h1>
+    <div class="links">
+        <button onclick="mostrarModal()">Cadastrar Plano</button>
+    </div>
+    <table>
+        <th colspan="5">
+            PLANOS
+        </th>
+        <tr>
+            <td>NOME</td>
+            <td>DESCRIÇÃO</td>
+            <td>TIPO</td>
+            <td>DIAS</td>
+            <td>AÇÕES</td>
+        </tr>
+        {% for plano in planos %}
+        <tr>
+            <td>{{plano.nome}}</td>
+            <td>{{plano.descricao}}</td>
+            <td>{{plano.tipo}}</td>
+            <td>{{plano.quantidadeDias}}</td>
+            <td><button id="botao" name="botao" value="{{ plano.id }}"
+                    onclick="showmodal('{{plano.id}}')">Detalhes</button></td>
+        </tr>
+        {% endfor %}
+        <tr>
+            <td colspan="5"><a href="/"><button>Voltar</button></a></td>
+        </tr>
+    </table>
+    
+</div>
+
+
+{% include "main/modals/planoModal.html" %}
+{% include "main/modals/cadastrarPlanoModal.html" %}
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/main.js"></script>
+<script src="../static/js/planoModal.js"></script>
+<script src="../static/js/cadastrarPlanoModal.js"></script>
+{% endblock %}

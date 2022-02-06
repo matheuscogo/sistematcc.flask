@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+
+<head>
+     <title>{{ title }}</title>
+     <link rel="stylesheet" href='../static/css/estilos.css' />
+</head>
+
+<body>
+     <h1>{{ title }}</h1>
+     <form method="POST" action="excluirMatriz">
+          RFID:
+          <select name="id" id="id">
+               {% for matriz in matrizes %}
+               <option value="{{ matriz.id }}">{{ matriz.rfid }}</option>
+               {% endfor %}
+          </select>
+          <input type="submit" name="excluirMatriz" id="excluirMatriz" value="excluirMatriz">
+     </form>
+</body>
+
+</html>

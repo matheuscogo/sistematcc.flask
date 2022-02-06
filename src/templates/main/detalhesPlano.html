@@ -1,0 +1,60 @@
+{% block style %}
+<link rel="stylesheet" href="../../static/css/main/detalhesPlano.css">
+{% endblock %}
+<div class="wrapper">
+    <div class="links">
+        <a href="atualizarMatriz.html"><button>Atualizar Plano</button></a>
+        <a href="excluirMatriz.html"><button>Excluir Plano</button></a>
+    </div><br>
+    <table> 
+    <th colspan="6">
+        PLANO
+    </th>
+    <tr>
+        <td>ID</td>
+        <td>NOME</td>
+        <td>DESCRIÇÃO</td>
+        <td>TIPO</td>
+        <td>DIAS</td>
+        <td>ATIVO</td>
+    </tr>
+    <tr>
+        <td>{{plano.id}}</td>
+        <td>{{plano.nome}}</td>
+        <td>{{plano.descricao}}</td>
+        <td>{{plano.tipo}}</td>
+        <td>{{plano.quantidadeDias}}</td>
+        <td>{{plano.ativo}}</td>
+    </tr>
+    </table>
+    <div class="grafico-flex-center">
+        <canvas id="myChart" style="width:100%;max-width:700px"></canvas>
+    </div>
+        <div id="curve_chart" style="width: 900px; height: 500px"></div>
+    <table>
+        <th colspan="4">
+            DIAS
+        </th>
+        <tr>
+            <td>ID</td>
+            <td>PLANO</td>
+            <td>DIA</td>
+            <td>QUANTIDADE</td>
+        </tr>
+        {% for dia in dias %}
+        <!-- <tr>
+            <td>{{dia.id}}</td>
+            <td>{{dia.dia}}</td>
+            <td>{{plano.nome}}</td>
+            <td>{{dia.quantidade}}</td>
+        </tr> -->
+        <!--<input value="{{dia.quantidade}}"> -->
+        {% endfor %}
+        <input type="hidden" id="id" name="id" value="{{plano.id}}">
+    </table>
+</div>
+
+{% block scripts %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
+<script src="/static/js/graficoPlano.js"></script>
+{% endblock %}

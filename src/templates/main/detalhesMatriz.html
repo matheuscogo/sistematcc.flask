@@ -1,0 +1,63 @@
+{% block style %}
+<link rel="stylesheet" href="../../static/css/main/detalhesMatriz.css">
+{% endblock %}
+<div class="wrapper">
+    <div class="links">
+        <a href="cadastrarConfinamento.html?id={{matriz.id}}"><button>Cadastrar em um Plano</button></a>
+        <a href="atualizarMatriz.html"><button>Atualizar Matriz</button></a>
+        <a href="excluirMatriz.html"><button>Excluir Matriz</button></a>
+    </div><br>
+    <table> 
+    <th colspan="4">
+        MATRIZ
+    </th>
+    <tr>
+        <td>ID</td>
+        <td>Nº MATRIZ</td>
+        <td>RFID</td>
+        <td>CICLOS</td>
+    </tr>
+    <tr>
+        <td>{{matriz.id}}</td>
+        <td>{{matriz.numero}}</td>
+        <td>{{matriz.rfid}}</td>
+        <td>{{matriz.ciclos}}</td>
+    </tr>
+    </table>
+    <div class="grafico flex-center">
+        <canvas id="myChart" style="width:100%;max-width:700px"></canvas>
+    </div>
+    <table>
+        <th colspan="8">
+            REGISTROS
+        </th>
+        <tr>
+            <td>ID</td>
+            <td>MATRIZ</td>
+            <td>DATA DE ENTRADA</td>
+            <td>DATA DE SAIDA</td>
+            <td>HORA DE ENTRADA</td>
+            <td>HORA DE SAIDA</td>
+            <td>TEMPO</td>
+            <td>QUANTIDADE</td>
+        </tr>
+        {% for registro in registros %}
+        <tr>
+            <td>{{registro.id}}</td>
+            <td>{{registro.matriz}}</td>
+            <td>{{registro.dataEntrada}}</td>
+            <td>{{registro.dataSaida}}</td>
+            <td>{{registro.horaEntrada}}</td>
+            <td>{{registro.horaSaida}}</td>
+            <td>{{registro.tempo}}</td>
+            <td>{{registro.quantidade}}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+
+
+{% block scripts %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
+<script src="/static/js/graficoMatriz.js"></script>
+{% endblock %}

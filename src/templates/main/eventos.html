@@ -1,0 +1,36 @@
+{% extends "index.html" %}
+
+{% block pageStyle %}
+<link rel="stylesheet" href="../../static/css/styles.css">
+{% endblock %}
+
+{% block main %}
+<header>
+    Overview
+</header>
+<section>
+    <div>
+        <p>Teste1</p>
+        <h1>01</h1>
+    </div>
+    <div>
+        <p>Teste2</p>
+        <h1>02</h1>
+    </div>
+    <div>
+        <p>Teste3</p>
+        <h1>03</h1>
+    </div>
+    <div>
+        <p>Teste4</p>
+        <h1>04</h1>
+    </div>
+
+</section>
+<div class="grafico flex-center">
+    <canvas id="myChart" style="width:100%;max-width:700px"></canvas></div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js">
+    </script>
+    <script src="../static/js/main.js"></script>
+</div>
+{% endblock %}

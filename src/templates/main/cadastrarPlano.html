@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<head>
+     <title>{{ title }}</title>
+     {% block style %}
+     <link rel="stylesheet" href='../static/css/estilos.css' />
+     <link rel="stylesheet" href="http://code.jquery.com/ui/1.9.0/themes/base/jquery-ui.css" />
+     {% endblock %}
+
+</head>
+<body onload="data_dia_inicio()">
+     <h1>{{ title }}</h1>
+     <form method="POST" action="cadastrarPlano">
+          Nome:<input id="nome" name="nome">
+          Descrição:<input type="text" name="descricao" id="descricao">
+          Tipo: <select name="tipo" id="tipo">
+               <option value="114">Gestação</option>
+               <option value="250">Pré Gestação</option>
+               <option>Alternativo</option>
+          </select>
+          <input type="submit" name="cadastrarPlano" id="cadastrarPlano" value="Cadastrar">
+          <input type="hidden" name="json" id="json">
+     </form>
+     {{ retorno }}
+     Do dia <select id="select">
+          <option value="" selected disabled hidden>Escolha um dia</option>
+     </select> até o dia <select id="select2">
+          <option value="" selected disabled hidden>Escolha um dia</option>
+     </select> a quantidade de <input id="quantidade"> <button id="btn">Adicionar periodo</button>
+     <br><br>
+     <table id="myTable" name="myTable">
+          <thead>
+               <tr>
+                    <th colspan="2">Periodos</th>
+               </tr>
+          </thead>
+          <tbody>
+               <tr>
+                    <td>Dias</td>
+                    <td>Quantidade</td>
+               </tr>
+          </tbody>
+     </table>
+     {% block scripts%}
+     <script src="http://code.jquery.com/jquery-1.8.2.js"></script>
+     <script src="http://code.jquery.com/ui/1.9.0/jquery-ui.js"></script>
+     <script src="../static/js/cadastrarPlano.js"></script>
+     {% endblock %}
+     <input type="hidden" id="posicao" value="1">
+</body>
+</html>

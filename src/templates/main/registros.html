@@ -1,0 +1,36 @@
+{% extends "index.html" %}
+
+{% block pageStyle %}
+<link rel="stylesheet" href="../../static/css/matrizes.css">
+{% endblock %}
+
+{% block main %}
+<div class="wrapper">
+	   <h1>{{ title }}</h1>
+   <table>
+       <th colspan="7">
+           REGISTROS
+       </th>
+       <tr>
+           <td>ID</td>
+           <td>MATRIZ</td>
+           <td>DATA DE ENTRADA</td>
+           <td>DATA DE SAIDA</td>
+           <td>HORA DE ENTRADA</td>
+           <td>HORA DE SAIDA</td>
+           <td>AÇÕES</td>
+       </tr>
+       {% for registro in registros %}
+   <tr>
+        <td>{{registro.id}}</td>
+       <td>{{registro.matriz}}</td>
+        <td>{{registro.dataEntrada}}</td>
+        <td>{{registro.dataSaida}}</td>
+        <td>{{registro.horaEntrada}}</td>
+        <td>{{registro.horaSaida}}</td>
+        <td>{{registro.acoes}}</td>
+
+    </tr>
+</div>
+{% endfor %}
+{% endblock %}
