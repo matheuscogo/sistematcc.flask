@@ -105,7 +105,8 @@ class ListaMatrizes(Resource):
 
 
 @namespace.route('/delete/<int:id>',
-                 doc={"description": 'Apaga matrizes'})
+                 doc={"description": 'Apaga matrizes'},
+                 methods=['DELETE'])
 @namespace.param('id', 'ID da matriz')
 @namespace.expect(headers)
 class DeleteMatriz(Resource):
