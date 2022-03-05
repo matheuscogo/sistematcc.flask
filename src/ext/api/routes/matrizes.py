@@ -9,8 +9,8 @@ namespace = Namespace(name='Matrizes', description='Matrizes', path='/matrizes')
 
 insert_matriz = namespace.model('Dados para criação de uma matriz', {
     'rfid': fields.String(required=True, description='RFID'),
-    'numero': fields.Integer(required=True, description='Número da matriz'),
-    'ciclos': fields.Integer(required=True, description='Ciclos da matriz')
+    'numero': fields.String(required=True, description='Número da matriz'),
+    'ciclos': fields.String(required=True, description='Ciclos da matriz')
 })
 
 update_matriz = namespace.model('Dados para atualização de matrizes', {
@@ -47,9 +47,9 @@ class CreateMatriz(Resource):
         """Cadastra uma matriz"""
         try:
             parser = reqparse.RequestParser()
-            parser.add_argument('numero', type=int)
+            parser.add_argument('numero', type=str)
             parser.add_argument('rfid', type=str)
-            parser.add_argument('ciclos', type=int)
+            parser.add_argument('ciclos', type=str)
             args = parser.parse_args()
             matriz = matrizCRUD.cadastrarMatriz(args)
             if not matriz:

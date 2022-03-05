@@ -6,9 +6,9 @@ import json
 
 def cadastrarMatriz(args):  # Create
     try:
-        numero = int(args['numero'])
-        rfid = args['rfid']
-        ciclos = int(args['ciclos'])
+        numero = str(args['numero'])
+        rfid = str(args['rfid'])
+        ciclos = str(args['ciclos'])
         db.session.add(Matriz.Matriz(rfid=rfid, numero=numero, ciclos=ciclos))
         db.session.commit()
         return Response(response=json.dumps("{success: true, message: Matriz cadastrada com sucesso!, response: null}"), status=200)

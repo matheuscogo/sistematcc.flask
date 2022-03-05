@@ -1,20 +1,20 @@
 from ...db import db, ma
 from sqlalchemy.orm import relationship
+from .Matriz import Matriz
 
-class Confinamento(db.Model):
-    __tablename__ = "confinamento"
+class Inseminacao(db.Model):
+    __tablename__ = "inseminacao"
     id = db.Column("id", db.Integer, primary_key=True)
     planoId = db.Column(db.Integer, db.ForeignKey("planos.id"))
     matrizId = db.Column(db.Integer, db.ForeignKey("matrizes.id"))
-    dataConfinamento = db.Column("dataConfinamento", db.VARCHAR)
+    dataInseminacao = db.Column("dataInseminacao", db.VARCHAR)
     active = db.Column("active", db.Boolean, default=True)
     deleted = db.Column("deleted", db.Boolean, default=False)
    
-    matrizes = relationship("Matriz", foreign_keys=matrizId)
-    planos = relationship("Plano", foreign_keys=planoId)
+    matrizes = relationship(Matriz, foreign_keys=[matrizId])
+    planos = relationship("Plano", foreign_keys=[planoId])
 
-class ConfinamentoSchema(ma.SQLAlchemyAutoSchema):
+class InseminacaoSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
-        model = Confinamento
+        model = Inseminacao
         include_fk = False
-

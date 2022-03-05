@@ -8,22 +8,8 @@ class Plano(db.Model):
     descricao = db.Column("descricao", db.String)
     tipo = db.Column("tipo", db.String)
     quantidadeDias = db.Column("quantidadeDias", db.Integer)
-    ativo = db.Column("ativo", db.Boolean)
-
-    def __init__(
-        id = id,
-        nome = nome,
-        descricao = descricao,
-        tipo = tipo,
-        quantidadeDias = quantidadeDias,
-        ativo = ativo
-    ):
-        Plano.id = id
-        Plano.nome = nome
-        Plano.descricao = descricao
-        Plano.tipo = tipo
-        Plano.quantidadeDias = quantidadeDias
-        Plano.ativo = ativo
+    deleted = db.Column("deleted", db.Boolean, default=False)
+    active = db.Column("active", db.Boolean, default=True)
 
 class PlanoSchema(ma.SQLAlchemyAutoSchema):
     class Meta:

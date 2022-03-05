@@ -26,7 +26,7 @@ db:
 	@( \
 		source venv/bin/activate; \
 		pip install -e .[dev] --upgrade --no-cache; \
-		sqlite_web src/sistemaTCC.db --host=$(ip); \
+		sqlite_web src/sistemaTCC.db --host=localhost; \
 	)
 
 SHELL := /bin/bash

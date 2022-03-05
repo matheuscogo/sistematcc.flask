@@ -7,17 +7,7 @@ class Matriz(db.Model):
     rfid = db.Column("rfid", db.VARCHAR)
     numero = db.Column("numero", db.Integer)
     ciclos = db.Column("ciclos", db.Integer)
-
-    def __init__(
-        id = id,
-        rfid = rfid,
-        numero = numero,
-        ciclos = ciclos
-    ):
-        Matriz.id = id
-        Matriz.rfid = rfid
-        Matriz.numero = numero
-        Matriz.ciclos = ciclos
+    deleted = db.Column("deleted", db.Boolean, default=False)
 
 class MatrizSchema(ma.SQLAlchemyAutoSchema):
     class Meta:

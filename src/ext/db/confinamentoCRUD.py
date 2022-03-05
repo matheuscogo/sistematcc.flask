@@ -1,26 +1,48 @@
+from queue import Empty
 from ..site.model import Confinamento
 from ..site.model.Confinamento import ConfinamentoSchema
 from ..db import db
 import datetime
 from werkzeug.wrappers import Response, Request
+from xmlrpc.client import ResponseError
 import json
-from ..site.model import Dias
-from ..site.model import Plano
-from ..site.model import Matriz
-from ..site.model import Registro
+from ..site.model import Dia
+from ..site.model.Plano import Plano
+from ..site.model.Matriz import Matriz
+from ..site.model.Registro import Registro
 from ..db import db
 from sqlalchemy.sql import func
+from datetime import datetime
 
 def cadastrarConfinamento(args):  # Create
     try:
-        dataConfinamento = str(args['dataConfinamento'])
-        matriz = int(args['matriz'])
-        plano = int(args['plano'])
+        dataConfinamento = int(args['dataConfinamento'])
+        matrizId = int(args['matrizId'])
+        planoId = int(args['planoId'])
+
+        dataConfinamento = datetime.strftime(datetime.fromtimestamp(dataConfinamento/1000.0), '%d/%m/%y')
+
+        if not matrizId:
+            raise Exception(ResponseError)
+
+        if not planoId:
+            raise Exception(ResponseError)
+            
+        if not dataConfinamento:
+            raise Exception(ResponseError)
+
+        confinamento = db.session.query(Confinamento.Confinamento).filter_by(matrizId=matrizId, deleted=False, active=True).first()
+
+        if confinamento:
+            confinamento.active = False
+            confinamento.deleted = True
+
         db.session.add(Confinamento.Confinamento(
-            matriz=matriz,
-            dataConfinamento=dataConfinamento,            
-            plano=plano
-        ))
+            planoId=planoId,
+            matrizId=matrizId,
+            dataConfinamento=dataConfinamento)
+        )
+
         db.session.commit()
         return Response(response=json.dumps("{success: true, message: Confinamento cadastrado com sucesso!, response: null}"), status=200)
     except BaseException as e:
@@ -31,6 +53,22 @@ def consultarConfinamento(matriz):  # Read
     try:
         confinamento = db.session.query(Confinamento).filter_by(matriz=matriz).first()
         return ConfinamentoSchema().dump(confinamento)
+    except BaseException as e:
+        return str(e)
+
+def consultarConfinamentos():  # Read
+    try:
+        response = db.session.query(Confinamento.Confinamento).filter_by(deleted=False, active=True).all()
+        
+        confinamentos = []
+
+        for confinamento in response:
+            matrizDescription = db.session.query(Matriz).filter_by(id=int(confinamento.matrizId), deleted=False).first()
+            planoDescription = db.session.query(Plano).filter_by(id=int(confinamento.planoId), active=True, deleted=False).first()
+            obj = {"id": confinamento.id, "planoDescription": planoDescription.nome, "matrizDescription": matrizDescription.rfid, "dataConfinamento": confinamento.dataConfinamento}
+            confinamentos.append(obj)
+            
+        return confinamentos
     except BaseException as e:
         return str(e)
 

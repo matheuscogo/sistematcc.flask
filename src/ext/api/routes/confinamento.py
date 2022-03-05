@@ -10,23 +10,22 @@ from werkzeug.exceptions import InternalServerError
 namespace = Namespace('Confinamentos', description='Confinamentos', path='/confinamentos')
 
 insert_confinamento = namespace.model('Dados para criação de Matrizes', {
-    'dataConfinamento': fields.String(required=True, description='Data de entrada no confinamento'),
-    'matriz': fields.Integer(required=True, description='FK da matriz'),
-    'plano': fields.Integer(required=True, description='FK do plano de alimentação')
+    'dataConfinamento': fields.Integer(required=True, description='Data de entrada no confinamento'),
+    'matrizId': fields.Integer(required=True, description='FK da matriz'),
+    'planoId': fields.Integer(required=True, description='FK do plano de alimentação')
 })
 
 update_confinamento = namespace.model('Dados para atualizar o confinamento', {
-    'id': fields.Integer(required=True, description='ID do confinamento'),
     'dataConfinamento': fields.String(required=True, description='Data de /entrada no confinamento'),
-    'matriz': fields.Integer(required=True, description='FK da matriz'),
-    'plano': fields.Integer(required=True, description='FK do plano de alimentação')
+    'matrizId': fields.Integer(required=True, description='FK da matriz'),
+    'planoId': fields.Integer(required=True, description='FK do plano de alimentação')
 })
 
 list_confinamento = namespace.model('Lista de confinamentos', {
-    'id': fields.Integer(required=True, description='ID do confinamento'),
+    'id': fields.Integer(required=True, description='ID da inseminação'),
     'dataConfinamento': fields.String(required=True, description='Data de /entrada no confinamento'),
-    'matriz': fields.Integer(required=True, description='FK da matriz'),
-    'plano': fields.Integer(required=True, description='FK do plano de alimentação')
+    'matrizDescription': fields.String(required=True, description='FK da matriz'),
+    'planoDescription': fields.String(required=True, description='FK do plano de alimentação')
 })
 
 list_confinamento_response = namespace.model('Resposta para lista de confinamentos', {
@@ -43,9 +42,9 @@ class CreateConfinamento(Resource):
         """Cadastra um confinamento"""
         try:
             parser = reqparse.RequestParser()
-            parser.add_argument('dataConfinamento', type=str)
-            parser.add_argument('matriz', type=int)
-            parser.add_argument('plano', type=int)
+            parser.add_argument('dataConfinamento', type=int)
+            parser.add_argument('matrizId', type=int)
+            parser.add_argument('planoId', type=int)
             args = parser.parse_args()
             confinamento = confinamentoCRUD.cadastrarConfinamento(args)
             if not confinamento:
@@ -64,8 +63,8 @@ class UpdateRegistro(Resource):
             parser = reqparse.RequestParser()
             parser.add_argument('id', type=int)
             parser.add_argument('dataConfinamento', type=str)
-            parser.add_argument('matriz', type=int)
-            parser.add_argument('plano', type=int)
+            parser.add_argument('matrizId', type=int)
+            parser.add_argument('planoId', type=int)
             args = parser.parse_args()
             confinamento = confinamentoCRUD.atualizarConfinamento(args)
             if not confinamento:
@@ -95,8 +94,6 @@ class ListaRegistros(Resource):
         """Lista todos os confinamentos"""
         try:
             confinamentos = confinamentoCRUD.consultarConfinamentos()
-            if not confinamentos:
-                raise BaseException("Erro ao consultar no banco de dados")
             return {"data": confinamentos}
         except HTTPException as e:
             raise InternalServerError(e.args[0])

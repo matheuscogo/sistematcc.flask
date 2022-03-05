@@ -13,8 +13,11 @@
         "FLASK_APP": "src/app.py",
         "FLASK_ENV": "development"
       },
-      "args": ["run", "--no-debugger", "--host=localhost"],
+      "args": [
+        "run",
+        "--no-debugger"
+      ],
       "jinja": true
-    }
+    },
   ]
 }

@@ -33,6 +33,7 @@ get_plano_response = namespace.model('Response para plano de alimentação', {
 })
 
 list_planos = namespace.model('Lista de planos de alimentação', {
+    'id': fields.Integer(required=True, description='ID do plano de alimentação'),
     'nome': fields.String(required=True, description='Nome do plano de alimentação'),
     'descricao': fields.String(required=True, description='Descrição do plano de alimentação'),
     'tipo': fields.Integer(required=True, description='Tipo do plano de alimentação'),

@@ -1,4 +1,4 @@
-from ..site.model import Plano, Dias
+from ..site.model import Dia, Plano
 from ..site.model.Plano import PlanoSchema
 from ..db import db
 from werkzeug.wrappers import Response, Request
@@ -10,13 +10,12 @@ def cadastrarPlano(args):  # Create
         descricao = args['descricao']
         tipo = args['tipo']
         quantidadeDias = args['quantidadeDias']
-        ativo = True
         db.session.add(Plano.Plano(
             nome=nome,
             descricao=descricao,
             tipo=tipo,
-            quantidadeDias=quantidadeDias,
-            ativo=ativo)
+            quantidadeDias=quantidadeDias
+            )
         )
         db.session.commit()
         return Response(response=json.dumps("{success: true, message: Plano cadastrado com sucesso!, response: null}"), status=200)
@@ -85,7 +84,7 @@ def exists(nome):
 def consultarQuantidade(id):
     try:
         quantidades = db.session.query(
-            Dias.Dias.quantidade).filter_by(plano=id).all()
+            Dia.Dias.quantidade).filter_by(plano=id).all()
         array = list()
         for quantidade in quantidades:
             array.append(quantidade[0])

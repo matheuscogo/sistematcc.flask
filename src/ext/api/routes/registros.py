@@ -41,7 +41,7 @@ list_registros = namespace.model('Lista de registros', {
 })
 
 list_registros_response = namespace.model('Resposta da lista de registros', {
-    'data': fields.Nested(list_registros, required=True, description='Lista de registros')
+    'response': fields.Nested(list_registros, required=True, description='Lista de registros')
 })
 
 headers = namespace.parser()
@@ -115,9 +115,7 @@ class ListaRegistros(Resource):
         """Lista todos os registros"""
         try:
             registros = registroCRUD.consultarRegistros()
-            if not registros:
-                raise BaseException("Erro ao consultar no banco de dados")
-            return {"data": registros}
+            return { "response": registros }
         except HTTPException as e:
             raise InternalServerError(e.args[0])
 

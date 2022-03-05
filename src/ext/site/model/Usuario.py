@@ -7,12 +7,6 @@ class Usuario(db.Model):
     senha = db.Column("senha", db.Unicode)
     admin = db.Column("admin", db.Boolean)
 
-    def __repr__(self):
-        return self.email
-
-
-
-
 
 
 
