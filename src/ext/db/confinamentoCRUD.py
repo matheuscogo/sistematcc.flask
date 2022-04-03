@@ -1,4 +1,6 @@
 from queue import Empty
+
+from responses import activate, delete
 from ..site.model import Confinamento
 from ..site.model.Confinamento import ConfinamentoSchema
 from ..db import db
@@ -12,7 +14,8 @@ from ..site.model.Matriz import Matriz
 from ..site.model.Registro import Registro
 from ..db import db
 from sqlalchemy.sql import func
-from datetime import datetime
+from datetime import datetime, timedelta
+
 
 def cadastrarConfinamento(args):  # Create
     try:
@@ -49,9 +52,9 @@ def cadastrarConfinamento(args):  # Create
         return Response(response=json.dumps("{success: false, message: " + e.args[0] + ", response: null}"), status=501)
 
 
-def consultarConfinamento(matriz):  # Read
+def consultarConfinamento(id):  # Read
     try:
-        confinamento = db.session.query(Confinamento).filter_by(matriz=matriz).first()
+        confinamento = db.session.query(Confinamento).filter_by(id=id, active=True, deleted=False).first()
         return ConfinamentoSchema().dump(confinamento)
     except BaseException as e:
         return str(e)
@@ -97,120 +100,50 @@ def excluirConfinamento(id):  # Delete
         return Response(response=json.dumps("{success: false, message: "+ e.args[0] +", response: null}"), status=501)
 
 
-def consultarQuantidade(rfid, dataEntrada):
-    confinamento = consultarConfinamento(rfid)
-    matriz = confinamento[0]
-    plano = confinamento[1]
-    dataConfinamento = confinamento[2]
-    dia1 = converteData(dataConfinamento)
-    dia2 = converteData(dataEntrada)
-    dia = (dia2 - dia1).days
-    print("--------------------")
-    print()
-    print("DIA 1 = " + str(dia1))
-    print("DIA 2 = " + str(dia2))
-    print("Quantidade de dias no confinamento = " + str(dia))
-    stmt = """SELECT d.quantidade
-              FROM dias d, planos p
-              WHERE p.id = d.plano
-              AND p.id = """ + str(plano) + """
-              AND d.dia = """ + str(dia)
-    quantidade = db.session.execute(stmt).first()[0]
-    total = db.session.query(func.sum(Registro.Registro.quantidade)).filter_by(matriz=matriz, dataEntrada=dataEntrada).first()[0]
-    if dia >= 27:
-        print("ABRIR PORTA")
-    else:
-        print("Não está em tempo ainda")
-    if total is None:
-        total = quantidade
-    else:
-        total = quantidade - total
-    print("Total de ração do dia = " + str(total))
-    print()
-    print("--------------------")
-    dia = 0
-    return total
-
-
-def consultarUltimaEntrada(matriz):
-    dia2 = """SELECT MAX(r.dataEntrada) as dia
-              FROM registros r, confinamento c
-              WHERE r.matriz = c.matriz
-              AND c.matriz = """ + str(matriz)
-    dia2 = db.session.execute(dia2).first()[0]
-    return dia2
-
-
-def converteData(dataEntrada):
-    data = datetime.datetime.strptime(dataEntrada, "%Y-%m-%d")
-    return data
-
-
-def atualizarMatriz(request):  # Update
+def getConfinamentoByMatriz(matrizId):
     try:
-        matriz = db.session.query(Matriz.Matriz).filter_by(
-            id=request.form.get("id")).first()
-        matriz.quantidade = request.form.get("quantidade")
-        db.session.commit()
-        return True
+        confinamento = db.session.query(Confinamento.Confinamento).filter_by(matrizId=matrizId, active=True, deleted=False).first()
+        return ConfinamentoSchema().dump(confinamento)
     except BaseException as e:
-        return False
+        return str(e)
 
 
-def excluirMatriz(id):  # Delete
+def getQuantityForMatriz(matrizId):
     try:
-        matriz = db.session.query(Matriz.Matriz).filter_by(id=id).first()
-        db.session.delete(matriz)
-        db.session.commit()
-        return True
+        confinamento = db.session.query(Confinamento).filter_by(matrizId=matrizId, deleted=False, active=True).first()
+        matrizId = confinamento['matrizId']
+        planoId = confinamento['planoId']
+        dataEntrada = confinamento['dataConfinamento']
+        
+        day = getDaysInConfinament(matrizId=matrizId)
+        dayQuantity = db.session.query(Dia.Dias.quantidade).filter_by(planoId=planoId, dia=day).first()
+        totalQuantity = db.session.query(func.sum(Registro.Registro.quantidade)).filter_by(matriz=matrizId, dataEntrada=dataEntrada).first()[0]
+        
+        total = totalQuantity - dayQuantity
+        return total
     except BaseException as e:
-        return False
+        return e.args[0]
 
 
-def consultarMatriz(id):  # Read
+def verifyDaysToOpen(matrizId):
     try:
-        matriz = db.session.query(Matriz.Matriz).filter_by(id=id).first()
-        return matriz
-    except:
-        return False
+        day = getDaysInConfinament(matrizId=matrizId)
+        
+        # paramters = getParameters
+        
+        if day >= 110:
+            return True
+        else:
+            return False
+    except BaseException as e:
+        return e.args[0]
 
 
-def consultarMatrizRFID(rfid):  # Read
-    try:
-        matriz = db.session.query(Matriz.Matriz).filter_by(rfid=rfid).first()
-        return matriz
-    except:
-        return False
-
-
-def existsMatriz(rfid):
-    exists = db.session.query(db.exists().where(
-        Matriz.Matriz.rfid == rfid)).scalar()
-    print(str(exists))
-    if exists:
-        return False
-    else:
-        return True
-
-
-def existsPlano(numero):
-    exists = db.session.query(db.exists().where(
-        Matriz.Matriz.numero == numero)).scalar()
-    print(str(exists))
-    if exists:
-        return False
-    else:
-        return True
-
-
-# def consultarQuantidade(id):
-#     try:
-#         quantidades = db.session.query(
-#             Dias.Dias.quantidade).filter_by(plano=id).all()
-#         array = list()
-#         for quantidade in quantidades:
-#             array.append(quantidade[0])
-#         json_str = json.dumps(array)
-#         return json_str
-#     except:
-#         return False
+def getDaysInConfinament(matrizId):
+    confinamento = db.session.query(Confinamento).filter_by(matrizId=matrizId, deleted=False, active=True).first()
+    dataEntrada = datetime.datetime.strptime(confinamento['dataConfinamento'], '%d/%m/%y')
+    dataAtual = datetime.datetime.today()
+    days = dataAtual - timedelta(dataEntrada)
+    print("DIA ENTRADA = " + str(dataEntrada))
+    print("DIA ATUAL = " + str(dataAtual))
+    return days

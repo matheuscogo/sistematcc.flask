@@ -82,15 +82,17 @@ def excluirMatriz():  # Excluir Matriz
         return render_template("index.html", **templateData)
 
 
-@bp_controller.route('/cadastrarPlano', methods=['POST', 'GET'])
+@bp_controller.route('/cadastrarPlano', methods=['POST'])
 def cadastrarPlano():  # Cadastrar Plano
     try:
-        if planosCRUD.exists(request.form.get("nome")):
-            plano = Plano(nome=request.form.get("nome"),
+        if planosCRUD.exists(request.form.get("nome")) is not None:
+            plano = Plano(
+                nome=request.form.get("nome"),
                           descricao=request.form.get("descricao"),
                           tipo=request.form.get("tipo"),
-                          quantidadeDias=request.form.get("quantidadeDias"),
-                          ativo=1)
+                          quantidadeDias=int(request.form.get("tipo")),
+                          active=1
+            )
             json_list = str(('{"plano" : [' + request.form.get("json") + ']}'))
             planosCRUD.cadastrarPlano(plano, json_list)
             templateData = {
@@ -99,7 +101,7 @@ def cadastrarPlano():  # Cadastrar Plano
                 'color': 'green',
                 'aviso': "Plano de alimentação cadastrado com sucesso!"
             }
-            return render_template("main/planos.html", **templateData)
+            return redirect("http://localhost:3000/planos")
         else:
             templateData = {
                 'title': 'Sistema de gerenciamento de matrizes',

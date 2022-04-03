@@ -7,14 +7,16 @@ class Inseminacao(db.Model):
     id = db.Column("id", db.Integer, primary_key=True)
     planoId = db.Column(db.Integer, db.ForeignKey("planos.id"))
     matrizId = db.Column(db.Integer, db.ForeignKey("matrizes.id"))
+    confinamentoId = db.Column(db.Integer, db.ForeignKey("confinamento.id"))
     dataInseminacao = db.Column("dataInseminacao", db.VARCHAR)
     active = db.Column("active", db.Boolean, default=True)
     deleted = db.Column("deleted", db.Boolean, default=False)
    
     matrizes = relationship(Matriz, foreign_keys=[matrizId])
     planos = relationship("Plano", foreign_keys=[planoId])
+    confinamento = relationship("Confinamento", foreign_keys=[confinamentoId])
 
 class InseminacaoSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
         model = Inseminacao
-        include_fk = False
+        include_fk = True

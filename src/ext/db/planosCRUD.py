@@ -1,26 +1,48 @@
-from ..site.model import Dia, Plano
+from ..site.model import Plano
+from ..site.model import Dia
 from ..site.model.Plano import PlanoSchema
 from ..db import db
 from werkzeug.wrappers import Response, Request
 import json
 
-def cadastrarPlano(args):  # Create
+# def cadastrarPlano(args):  # Create
+#     try:
+#         nome = args['nome']
+#         descricao = args['descricao']
+#         tipo = args['tipo']
+#         quantidadeDias = args['quantidadeDias']
+#         db.session.add(Plano.Plano(
+#             nome=nome,
+#             descricao=descricao,
+#             tipo=tipo,
+#             quantidadeDias=quantidadeDias
+#             )
+#         )
+#         db.session.commit()
+#         return Response(response=json.dumps("{success: true, message: Plano cadastrado com sucesso!, response: null}"), status=200)
+#     except BaseException as e:
+#         return Response(response=json.dumps("{success: false, message: " + e.args[0] + ", response: null}"), status=501)
+
+def cadastrarPlano(plano, dias):  # Create
     try:
-        nome = args['nome']
-        descricao = args['descricao']
-        tipo = args['tipo']
-        quantidadeDias = args['quantidadeDias']
-        db.session.add(Plano.Plano(
-            nome=nome,
-            descricao=descricao,
-            tipo=tipo,
-            quantidadeDias=quantidadeDias
-            )
-        )
-        db.session.commit()
-        return Response(response=json.dumps("{success: true, message: Plano cadastrado com sucesso!, response: null}"), status=200)
+        if plano.nome is not None:
+            planoObj = json.loads(str(dias))
+            days = planoObj["plano"]
+            db.session.add(plano)
+            db.session.commit()
+            for i in days:
+                quantidade = i["quantidade"]
+                dia1 = i["dias"][0]
+                dia2 = i["dias"][1]
+                for y in range(dia1, (dia2+1)):
+                    print("DIAS -> " + str(y))
+                    db.session.add(Dia.Dias(planoId=int(plano.id), dia = y, quantidade=quantidade))
+                    db.session.commit()
+            return ""
+        else:
+            return ""
     except BaseException as e:
-        return Response(response=json.dumps("{success: false, message: " + e.args[0] + ", response: null}"), status=501)
+        return False
 
 
 def consultarPlanos():  # Read

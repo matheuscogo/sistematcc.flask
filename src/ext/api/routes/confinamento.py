@@ -111,6 +111,20 @@ class DeleteRegistro(Resource):
         except Exception as e:
             raise InternalServerError(e.args[0])
 
+
+@namespace.route('/getConfinamentoByMatriz/<int:matrizId>')
+@namespace.param('matrizId', 'ID da matriz')
+@namespace.expect(headers)
+class GetConfinamentoByMatriz(Resource):
+    def get(self, matrizId):
+        """Consulta um confinamento pelo id de uma matriz"""
+        try:
+            confinamento = confinamentoCRUD.getConfinamentoByMatriz(matrizId)
+            return confinamento
+        except Exception as e:
+            raise InternalServerError(e.args[0])
+
+
 def bind_with_api(api: Api):
     api.add_namespace(namespace)
     return None

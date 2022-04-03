@@ -89,6 +89,18 @@ class GetMatriz(Resource):
             return matriz
         except HTTPException as e:
             raise InternalServerError(e.args[0])
+        
+@namespace.route('getMatrizByRfid/<rfid>')
+@namespace.param('rfid')
+@namespace.expect(headers)
+class GetMatriz(Resource):
+    def get(self, rfid):
+        """Consulta uma matriz por rfid"""
+        try:
+            matriz = matrizCRUD.getMatrizByRfid(rfid=rfid)
+            return matriz
+        except HTTPException as e:
+            raise InternalServerError(e.args[0])
 
 
 @namespace.route('/', doc={"description": 'Lista todos os matrizes'})

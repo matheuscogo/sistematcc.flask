@@ -5,7 +5,7 @@ class Matriz(db.Model):
     __table_args__ = {'extend_existing': True}
     id = db.Column("id", db.Integer, primary_key=True)
     rfid = db.Column("rfid", db.VARCHAR)
-    numero = db.Column("numero", db.Integer)
+    numero = db.Column("numero", db.VARCHAR)
     ciclos = db.Column("ciclos", db.Integer)
     deleted = db.Column("deleted", db.Boolean, default=False)
 

@@ -16,5 +16,5 @@ class Confinamento(db.Model):
 class ConfinamentoSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
         model = Confinamento
-        include_fk = False
+        include_fk = True
 

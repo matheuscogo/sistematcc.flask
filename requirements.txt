@@ -1,3 +1,7 @@
+flask
+flask-Migrate
+flask-marshmallow
+Flask_marshmallow
 Flask
 Flask-Migrate
 flask-marshmallow

@@ -11,6 +11,7 @@ from ..db import db
 from werkzeug.wrappers import Response, Request
 import json
 
+
 def cadastrarInseminacao(args):  # Create
     try:
         matrizId = int(args['matrizId'])
@@ -18,72 +19,88 @@ def cadastrarInseminacao(args):  # Create
         dataInseminacao = args['dataInseminacao']
         isNewCiclo = args['isNewCiclo']
 
-        dataInseminacao = datetime.strftime(datetime.fromtimestamp(dataInseminacao/1000.0), '%d/%m/%y')
+        dataInseminacao = datetime.strftime(
+            datetime.fromtimestamp(dataInseminacao/1000.0), '%d/%m/%y')
 
         if not matrizId:
             raise Exception(ResponseError)
 
         if not planoId:
             raise Exception(ResponseError)
-            
+
         if not dataInseminacao:
             raise Exception(ResponseError)
 
-        matriz = db.session.query(Matriz).filter_by(id=matrizId, deleted=False).first()
-        inseminacao = db.session.query(Inseminacao).filter_by(matrizId=matrizId, deleted=False, active=True).first()
-        confinamento = db.session.query(Confinamento).filter_by(matrizId=matrizId, deleted=False, active=True).first()
+        matriz = db.session.query(Matriz).filter_by(
+            id=matrizId, deleted=False).first()
+        inseminacao = db.session.query(Inseminacao).filter_by(
+            matrizId=matrizId, deleted=False, active=True).first()
+        confinamento = db.session.query(Confinamento).filter_by(
+            matrizId=matrizId, deleted=False, active=True).first()
 
         if inseminacao:
             inseminacao.active = False
             inseminacao.deleted = True
 
-            
         if confinamento:
             confinamento.active = False
             confinamento.deleted = True
-
-        db.session.add(Confinamento(
+            
+        newConfinamento = Confinamento(
             planoId=planoId,
             matrizId=matrizId,
-            dataConfinamento=dataInseminacao)
-        )
+            dataConfinamento=dataInseminacao)   
+        
+        db.session.add(newConfinamento)
+        db.session.flush()
+        
+        print(newConfinamento.id)
 
-        if isNewCiclo:        
+        if isNewCiclo:
             matriz.ciclos = matriz.ciclos + 1
 
-        db.session.add(Inseminacao(
+        newInseminacao = Inseminacao(
             planoId=planoId,
             matrizId=matrizId,
-            dataInseminacao=dataInseminacao)
-        )
-
+            dataInseminacao=dataInseminacao,
+            confinamentoId=newConfinamento.id)
+        # adicionar uma chave estrangeira na tabela inseminação para saber qual confinamento ela pertence
+        db.session.add(newInseminacao)
         db.session.commit()
         return Response(response=json.dumps("{success: true, message: Inseminacao cadastrado com sucesso!, response: null}"), status=200)
     except BaseException as e:
         return Response(response=json.dumps("{success: false, message: " + e.args[0] + ", response: null}"), status=501)
+    finally:
+        db.session.close()
 
 
 def consultarInseminacoes():  # Read
     try:
-        response = db.session.query(Inseminacao).filter_by(deleted=False, active=True).all()
+        response = db.session.query(Inseminacao).filter_by(
+            deleted=False, active=True).all()
         inseminacoes = []
 
         for inseminacao in response:
-            matrizDescription = db.session.query(Matriz).filter_by(id=int(inseminacao.matrizId), deleted=False).first()
-            planoDescription = db.session.query(Plano).filter_by(id=int(inseminacao.planoId), active=True, deleted=False).first()
-            obj = {"id": inseminacao.id, "planoDescription": planoDescription.nome, "matrizDescription": matrizDescription.rfid, "dataInseminacao": inseminacao.dataInseminacao}
+            matrizDescription = db.session.query(Matriz).filter_by(
+                id=int(inseminacao.matrizId), deleted=False).first()
+            planoDescription = db.session.query(Plano).filter_by(
+                id=int(inseminacao.planoId), active=True, deleted=False).first()
+            obj = {"id": inseminacao.id, "planoDescription": planoDescription.nome,
+                   "matrizDescription": matrizDescription.rfid, "dataInseminacao": inseminacao.dataInseminacao}
             inseminacoes.append(obj)
-            
+
         return inseminacoes
     except BaseException as e:
         return Response(response=json.dumps("{success: false, message: " + e.args[0] + ", response: null}"), status=501)
-    
-def consultarInseminacao(id): # Read
+
+
+def consultarInseminacao(id):  # Read
     try:
         inseminacao = db.session.query(Inseminacao).filter_by(id=id).first()
         return InseminacaoSchema().dump(inseminacao)
     except Exception as e:
         return Response(response=json.dumps("{success: false, message: " + e.args[0] + ", response: null}"), status=501)
+
 
 def atualizarInseminacao(args):  # Update
     try:
@@ -106,4 +123,4 @@ def excluirInseminacao(id):  # Delete
         db.session.commit()
         return Response(response=json.dumps("{success: true, message: Inseminacao excluido com sucesso!, response: null}"), status=200)
     except BaseException as e:
-        return Response(response=json.dumps("{success: false, message: "+ e.args[0] +", response: null}"), status=501)
+        return Response(response=json.dumps("{success: false, message: " + e.args[0] + ", response: null}"), status=501)

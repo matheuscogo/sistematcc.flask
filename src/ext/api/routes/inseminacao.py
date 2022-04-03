@@ -1,4 +1,3 @@
-from crypt import methods
 from ext.site.model.Inseminacao import Inseminacao, InseminacaoSchema
 from ...db import db, inseminacaoCRUD
 from flask_restx import Api, Namespace, Resource, fields, reqparse
