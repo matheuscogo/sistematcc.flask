@@ -11,7 +11,6 @@ from ..db import db
 from werkzeug.wrappers import Response, Request
 import json
 
-
 def cadastrarInseminacao(args):  # Create
     try:
         matrizId = int(args['matrizId'])
