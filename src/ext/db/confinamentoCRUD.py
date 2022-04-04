@@ -2,6 +2,7 @@ from queue import Empty
 
 from responses import activate, delete
 from ..site.model import Confinamento
+from ..site.model import Registro
 from ..site.model.Confinamento import ConfinamentoSchema
 from ..db import db
 import datetime
@@ -15,7 +16,6 @@ from ..site.model.Registro import Registro
 from ..db import db
 from sqlalchemy.sql import func
 from datetime import datetime, timedelta
-
 
 def cadastrarConfinamento(args):  # Create
     try:
@@ -110,16 +110,23 @@ def getConfinamentoByMatriz(matrizId):
 
 def getQuantityForMatriz(matrizId):
     try:
-        confinamento = db.session.query(Confinamento).filter_by(matrizId=matrizId, deleted=False, active=True).first()
-        matrizId = confinamento['matrizId']
-        planoId = confinamento['planoId']
-        dataEntrada = confinamento['dataConfinamento']
+        confinamento = db.session.query(Confinamento.Confinamento).filter_by(matrizId=matrizId, deleted=False, active=True).first()
+        matrizId = confinamento.matrizId
+        planoId = confinamento.planoId
+        dataEntrada =  datetime.today().strftime('%d/%m/%y')
         
         day = getDaysInConfinament(matrizId=matrizId)
-        dayQuantity = db.session.query(Dia.Dias.quantidade).filter_by(planoId=planoId, dia=day).first()
-        totalQuantity = db.session.query(func.sum(Registro.Registro.quantidade)).filter_by(matriz=matrizId, dataEntrada=dataEntrada).first()[0]
+        dayQuantity = db.session.query(Dia.Dias.quantidade).filter_by(planoId=planoId, dia=day).first()[0]
+        totalQuantity = db.session.query(func.sum(Registro.quantidade)).filter_by(matrizId=matrizId, dataEntrada=dataEntrada).first()[0]
         
-        total = totalQuantity - dayQuantity
+        if totalQuantity is None:
+            totalQuantity = 0
+        
+        total = dayQuantity - totalQuantity
+        
+        if total <= 0:
+            total = 0
+            
         return total
     except BaseException as e:
         return e.args[0]
@@ -140,10 +147,10 @@ def verifyDaysToOpen(matrizId):
 
 
 def getDaysInConfinament(matrizId):
-    confinamento = db.session.query(Confinamento).filter_by(matrizId=matrizId, deleted=False, active=True).first()
-    dataEntrada = datetime.datetime.strptime(confinamento['dataConfinamento'], '%d/%m/%y')
-    dataAtual = datetime.datetime.today()
-    days = dataAtual - timedelta(dataEntrada)
+    confinamento = db.session.query(Confinamento.Confinamento).filter_by(matrizId=matrizId, deleted=False, active=True).first()
+    dataEntrada = datetime.strptime(confinamento.dataConfinamento, '%d/%m/%y')
+    dataAtual = datetime.today()
+    days = dataAtual - dataEntrada
     print("DIA ENTRADA = " + str(dataEntrada))
     print("DIA ATUAL = " + str(dataAtual))
-    return days
+    return days.days

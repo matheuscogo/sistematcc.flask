@@ -125,6 +125,45 @@ class GetConfinamentoByMatriz(Resource):
             raise InternalServerError(e.args[0])
 
 
+@namespace.route('/getDaysInConfinament/<int:matrizId>')
+@namespace.param('matrizId', 'ID da matriz')
+@namespace.expect(headers)
+class GetDaysInConfinament(Resource):
+    def get(self, matrizId):
+        """Consulta um confinamento pelo id de uma matriz"""
+        try:
+            confinamento = confinamentoCRUD.getDaysInConfinament(matrizId)
+            return confinamento
+        except Exception as e:
+            raise InternalServerError(e.args[0])
+
+
+@namespace.route('/verifyDaysToOpen/<int:matrizId>')
+@namespace.param('matrizId', 'ID da matriz')
+@namespace.expect(headers)
+class VerifyDaysToOpen(Resource):
+    def get(self, matrizId):
+        """Consulta um confinamento pelo id de uma matriz"""
+        try:
+            confinamento = confinamentoCRUD.verifyDaysToOpen(matrizId)
+            return confinamento
+        except Exception as e:
+            raise InternalServerError(e.args[0])
+
+
+@namespace.route('/getQuantityForMatriz/<int:matrizId>')
+@namespace.param('matrizId', 'ID da matriz')
+@namespace.expect(headers)
+class GetQuantityForMatriz(Resource):
+    def get(self, matrizId):
+        """Consulta um confinamento pelo id de uma matriz"""
+        try:
+            confinamento = confinamentoCRUD.getQuantityForMatriz(matrizId)
+            return confinamento
+        except Exception as e:
+            raise InternalServerError(e.args[0])
+
+
 def bind_with_api(api: Api):
     api.add_namespace(namespace)
     return None
