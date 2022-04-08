@@ -24,15 +24,15 @@ ip = $(shell (echo 192.168.0.105))
 SHELL := /bin/bash
 db:
 	@( \
-		source venv/bin/activate; \
+		source .venv/bin/activate; \
 		pip install -e .[dev] --upgrade --no-cache; \
 		sqlite_web src/sistemaTCC.db --host=localhost; \
 	)
 
 SHELL := /bin/bash
-flask:
+flask:asdasdsa
 	@( \
-		source venv/bin/activate; \
+		source .venv/bin/activate; \
 		pip install -e .[dev] --upgrade --no-cache; \
 		FLASK_APP=src/app.py FLASK_ENV=development flask run --host=$(ip); \
 	)
@@ -40,5 +40,5 @@ flask:
 SHELL := /bin/bash
 create-venv:
 	@( \
-		python3 -m venv venv; \
+		python3 -m venv .venv; \
 	)

@@ -33,9 +33,9 @@ def cadastrarInseminacao(args):  # Create
         matriz = db.session.query(Matriz).filter_by(
             id=matrizId, deleted=False).first()
         inseminacao = db.session.query(Inseminacao).filter_by(
-            matrizId=matrizId, deleted=False, active=True).first()
+            matrizId=matrizId, active=True).first()
         confinamento = db.session.query(Confinamento).filter_by(
-            matrizId=matrizId, deleted=False, active=True).first()
+            matrizId=matrizId, active=True).first()
 
         if inseminacao:
             inseminacao.active = False

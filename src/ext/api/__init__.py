@@ -2,7 +2,7 @@ from flask import Blueprint
 from flask_restx import Api, resource
 from flask_cors import CORS
 
-from .routes import matrizes, planos, registros, confinamento, dias, inseminacao
+from .routes import matrizes, planos, registros, confinamento, dias, inseminacao, aviso
 
 cors = CORS()
 
@@ -29,6 +29,7 @@ registros.bind_with_api(api)
 confinamento.bind_with_api(api)
 dias.bind_with_api(api)
 inseminacao.bind_with_api(api)
+aviso.bind_with_api(api)
 # usuarios.bind_with_api(api)
 
 def init_app(app):

@@ -14,4 +14,4 @@ class Registro(db.Model):
 class RegistroSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
         model = Registro
-        include_fk = True
+        include_fk = False

@@ -8,7 +8,6 @@ class Confinamento(db.Model):
     matrizId = db.Column(db.Integer, db.ForeignKey("matrizes.id"))
     dataConfinamento = db.Column("dataConfinamento", db.VARCHAR)
     active = db.Column("active", db.Boolean, default=True)
-    deleted = db.Column("deleted", db.Boolean, default=False)
    
     matrizes = relationship("Matriz", foreign_keys=matrizId)
     planos = relationship("Plano", foreign_keys=planoId)
@@ -16,5 +15,5 @@ class Confinamento(db.Model):
 class ConfinamentoSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
         model = Confinamento
-        include_fk = True
+        include_fk = False
 

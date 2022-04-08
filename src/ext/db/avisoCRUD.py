@@ -4,16 +4,15 @@ from queue import Empty
 from responses import activate, delete
 
 from ext.site.model import Inseminacao
-from ..site.model import Confinamento
+from ..site.model import Aviso
 from ..site.model import Registro
-from ..site.model.Confinamento import ConfinamentoSchema
+from ..site.model.Confinamento import Confinamento, ConfinamentoSchema
 from ..db import db
 import datetime
 from werkzeug.wrappers import Response, Request
 from xmlrpc.client import ResponseError
 import json
 from ..site.model import Dia
-from ..site.model import Aviso
 from ..site.model.Plano import Plano
 from ..site.model.Matriz import Matriz
 from ..site.model.Registro import Registro
@@ -21,37 +20,25 @@ from ..db import db
 from sqlalchemy.sql import func
 from datetime import datetime, timedelta
 
-def cadastrarConfinamento(args):  # Create
+def cadastrarAviso(args):  # Create
     try:
-        dataConfinamento = int(args['dataConfinamento'])
-        matrizId = int(args['matrizId'])
-        planoId = int(args['planoId'])
+        dataAviso = int(args['dataAviso'])
+        confinamentoId = int(args['confinamentoId'])
 
-        dataConfinamento = datetime.strftime(datetime.fromtimestamp(dataConfinamento/1000.0), '%d/%m/%y')
-
-        if not matrizId:
-            raise Exception(ResponseError)
-
-        if not planoId:
+        dataAviso = datetime.strftime(datetime.fromtimestamp(dataAviso/1000.0), '%d/%m/%y')
+        if not confinamentoId:
             raise Exception(ResponseError)
             
-        if not dataConfinamento:
+        if not dataAviso:
             raise Exception(ResponseError)
 
-        confinamento = db.session.query(Confinamento.Confinamento).filter_by(matrizId=matrizId, active=True).first()
-
-        if confinamento:
-            confinamento.active = False
-            confinamento.deleted = True
-
-        db.session.add(Confinamento.Confinamento(
-            planoId=planoId,
-            matrizId=matrizId,
-            dataConfinamento=dataConfinamento)
+        db.session.add(Aviso.Aviso(
+            confinamentoId=confinamentoId,
+            dataAviso=dataAviso)
         )
 
         db.session.commit()
-        return Response(response=json.dumps("{success: true, message: Confinamento cadastrado com sucesso!, response: null}"), status=200)
+        return Response(response=json.dumps("{success: true, message: Aviso cadastrado com sucesso!, response: null}"), status=200)
     except BaseException as e:
         return Response(response=json.dumps("{success: false, message: " + e.args[0] + ", response: null}"), status=501)
 
@@ -138,15 +125,18 @@ def getQuantityForMatriz(matrizId):
 
 def canOpenDoor(matrizId):
     try:
-        hasInseminacao = db.session.query(Inseminacao.Inseminacao.query.filter_by(confinamentoId=matrizId, active=True).exists()).scalar()
+
+        hasInseminacao = db.session.query(Inseminacao.Inseminacao.query.filter_by(matrizId=matrizId, active=True).exists()).scalar()
         
         if not hasInseminacao:
             return "Matriz não possui inseminação valida"
 
-        confinamento = db.session.query(Confinamento.Confinamento).filter_by(matrizId=matrizId, active=True).first()
-        canOpen = db.session.query(Aviso.Aviso).filter_by(confinamentoId=confinamento.id, active=True).first()
+        day = getDaysInConfinament(matrizId=matrizId)
 
-        if canOpen.separar:
+        # paramters = getParameters
+        if day >= 110:
+            # Aviso já foi inserido?
+            #if avisoInserido:
             return True
         else:
             return False

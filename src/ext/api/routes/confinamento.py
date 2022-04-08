@@ -138,14 +138,14 @@ class GetDaysInConfinament(Resource):
             raise InternalServerError(e.args[0])
 
 
-@namespace.route('/verifyDaysToOpen/<int:matrizId>')
+@namespace.route('/canOpenDoor/<int:matrizId>')
 @namespace.param('matrizId', 'ID da matriz')
 @namespace.expect(headers)
-class VerifyDaysToOpen(Resource):
+class canOpenDoor(Resource):
     def get(self, matrizId):
         """Consulta um confinamento pelo id de uma matriz"""
         try:
-            confinamento = confinamentoCRUD.verifyDaysToOpen(matrizId)
+            confinamento = confinamentoCRUD.canOpenDoor(matrizId)
             return confinamento
         except Exception as e:
             raise InternalServerError(e.args[0])
@@ -161,6 +161,18 @@ class GetQuantityForMatriz(Resource):
             confinamento = confinamentoCRUD.getQuantityForMatriz(matrizId)
             return confinamento
         except Exception as e:
+            raise InternalServerError(e.args[0])
+
+
+@namespace.route('/verifyDaysToOpen')
+@namespace.expect(headers)
+class ListaRegistros(Resource):
+    def get(self):
+        """Verifica quais matrizes podem ser separadas"""
+        try:
+            confinamentoCRUD.verifyDaysToOpen()
+            return True
+        except HTTPException as e:
             raise InternalServerError(e.args[0])
 
 
