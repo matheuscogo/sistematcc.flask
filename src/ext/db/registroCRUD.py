@@ -20,6 +20,7 @@ def cadastrarRegistro(args):  # Create
         dataSaida = datetime.strftime(datetime.fromtimestamp(dataSaida/1000.0), '%d/%m/%y')
         horaEntrada = datetime.strftime(datetime.fromtimestamp(horaEntrada/1000.0), 'HH:mm:ss')
         horaSaida = datetime.strftime(datetime.fromtimestamp(horaSaida/1000.0), 'HH:mm:ss')
+        
         tempo = datetime.strftime(datetime.fromtimestamp(tempo/1000.0), '%d/%m/%y')
         
         db.session.add(Registro.Registro(
