@@ -12,4 +12,4 @@ class Matriz(db.Model):
 class MatrizSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
         model = Matriz
-        include_fk = False
+        include_fk = True

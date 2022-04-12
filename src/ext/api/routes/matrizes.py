@@ -90,7 +90,7 @@ class GetMatriz(Resource):
         except HTTPException as e:
             raise InternalServerError(e.args[0])
         
-@namespace.route('getMatrizByRfid/<rfid>')
+@namespace.route('/getMatrizByRfid/<rfid>')
 @namespace.param('rfid')
 @namespace.expect(headers)
 class GetMatriz(Resource):

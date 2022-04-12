@@ -12,5 +12,5 @@ class Aviso(db.Model):
 class AvisoSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
         model = Aviso
-        include_fk = False
+        include_fk = True
 

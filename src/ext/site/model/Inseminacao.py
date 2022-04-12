@@ -17,4 +17,4 @@ class Inseminacao(db.Model):
 class InseminacaoSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
         model = Inseminacao
-        include_fk = False
+        include_fk = True

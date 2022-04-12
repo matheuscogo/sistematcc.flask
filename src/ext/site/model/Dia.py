@@ -12,5 +12,5 @@ class Dias(db.Model):
 class DiasSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
         model = Dias
-        include_fk = False
+        include_fk = True
 

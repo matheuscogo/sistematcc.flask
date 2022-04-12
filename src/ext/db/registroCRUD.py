@@ -2,6 +2,7 @@ from ..site.model import Registro
 from ..site.model.Registro import RegistroSchema
 from ..db import db
 from werkzeug.wrappers import Response, Request
+from datetime import datetime
 import json
 
 
@@ -14,6 +15,13 @@ def cadastrarRegistro(args):  # Create
         horaSaida = args['horaSaida']
         tempo = args['tempo']
         quantidade = args['quantidade']
+        
+        dataEntrada = datetime.strftime(datetime.fromtimestamp(dataEntrada/1000.0), '%d/%m/%y')
+        dataSaida = datetime.strftime(datetime.fromtimestamp(dataSaida/1000.0), '%d/%m/%y')
+        horaEntrada = datetime.strftime(datetime.fromtimestamp(horaEntrada/1000.0), 'HH:mm:ss')
+        horaSaida = datetime.strftime(datetime.fromtimestamp(horaSaida/1000.0), 'HH:mm:ss')
+        tempo = datetime.strftime(datetime.fromtimestamp(tempo/1000.0), '%d/%m/%y')
+        
         db.session.add(Registro.Registro(
             matriz=matriz,
             dataEntrada=dataEntrada,

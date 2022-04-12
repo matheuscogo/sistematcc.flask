@@ -14,4 +14,4 @@ class Plano(db.Model):
 class PlanoSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
         model = Plano
-        include_fk = False
+        include_fk = True
