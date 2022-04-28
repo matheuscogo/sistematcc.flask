@@ -50,34 +50,49 @@ def consultarConfinamento(id):  # Read
     except BaseException as e:
         return str(e)
 
-def consultarConfinamentos():  # Read
+def consultarAvisos():  # Read
     try:
-        response = db.session.query(Confinamento.Confinamento).filter_by(active=True).all()
+        response = db.session.query(Aviso.Aviso).filter_by(active=True).all()
         
-        confinamentos = []
-
-        for confinamento in response:
-            matrizDescription = db.session.query(Matriz).filter_by(id=int(confinamento.matrizId), deleted=False).first()
-            planoDescription = db.session.query(Plano).filter_by(id=int(confinamento.planoId), active=True, deleted=False).first()
-            obj = {"id": confinamento.id, "planoDescription": planoDescription.nome, "matrizDescription": matrizDescription.rfid, "dataConfinamento": confinamento.dataConfinamento}
-            confinamentos.append(obj)
+        avisos = []
+        
+        if response is not None:
+            for aviso in response:
+                separarDescription = "Pendente"
             
-        return confinamentos
+                confinamento = db.session.query(Confinamento).filter_by(id=int(aviso.confinamentoId), active=True).first()
+                matrizDescription = db.session.query(Matriz.rfid).filter_by(id=int(confinamento.matrizId), deleted=False).first()[0]
+            
+                if aviso.separar:
+                    separarDescription = "Em processo"
+                
+                obj = {
+                    'id': aviso.id,
+                    'confinamentoId': aviso.confinamentoId,
+                    'dataAviso': aviso.dataAviso,
+                    'separar': aviso.separar,
+                    'matrizDescription': matrizDescription,
+                    'separarDescription': separarDescription,
+                    'active ': aviso.active
+                }
+            
+                avisos.append(obj)
+
+        return avisos
     except BaseException as e:
         return str(e)
 
-def atualizarConfinamento(args):
+def separarMatriz(args):
     try:
-        id = args['id']
-        dataConfinamento = args['dataConfinamento']
-        plano = args['plano']
-        matriz = args['matriz']
-        confinamento = db.session.query(Confinamento).filter_by(id=id).first()
-        confinamento.dataConfinamento = dataConfinamento
-        confinamento.matriz = matriz
-        confinamento.plano = plano
+        id = args['id']    
+        separar = args['separar']
+
+        aviso = db.session.query(Aviso.Aviso).filter_by(id=id).first()
+
+        aviso.separar = separar
+        
         db.session.commit()
-        return Response(response=json.dumps("{success: true, message: Confinamento atualizado com sucesso!, response: null}"), status=200)
+        return Response(response=json.dumps("{success: true, message: Aviso atualizado com sucesso!, response: null}"), status=200)
     except BaseException as e:
         return Response(response=json.dumps("{success: false, message: " + e.args[0] + ", response: null}"), status=501)
 

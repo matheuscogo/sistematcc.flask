@@ -8,7 +8,7 @@ import json
 
 def cadastrarRegistro(args):  # Create
     try:
-        matriz = args['matriz']
+        matrizId = args['matrizId']
         dataEntrada = args['dataEntrada']
         dataSaida = args['dataSaida']
         horaEntrada = args['horaEntrada']
@@ -24,7 +24,7 @@ def cadastrarRegistro(args):  # Create
         tempo = datetime.strftime(datetime.fromtimestamp(tempo/1000.0), '%d/%m/%y')
         
         db.session.add(Registro.Registro(
-            matriz=matriz,
+            matriz=matrizId,
             dataEntrada=dataEntrada,
             dataSaida=dataSaida,
             horaEntrada=horaEntrada,

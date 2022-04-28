@@ -14,26 +14,28 @@ insert_aviso = namespace.model('Dados para criação de um aviso', {
     'confinamentoId': fields.Integer(required=True, description='FK do confinamento')
 })
 
-# update_confinamento = namespace.model('Dados para atualizar o confinamento', {
-#     'dataConfinamento': fields.String(required=True, description='Data de /entrada no confinamento'),
-#     'matrizId': fields.Integer(required=True, description='FK da matriz'),
-#     'planoId': fields.Integer(required=True, description='FK do plano de alimentação')
-# })
+update_aviso = namespace.model('Dados para atualizar o aviso', {
+    'id': fields.Integer(required=True, description='ID do aviso'),
+    'separar': fields.Boolean(required=True, description='Valor da flag')
+})
 
-# list_confinamento = namespace.model('Lista de confinamentos', {
-#     'id': fields.Integer(required=True, description='ID da inseminação'),
-#     'dataConfinamento': fields.String(required=True, description='Data de /entrada no confinamento'),
-#     'matrizDescription': fields.String(required=True, description='FK da matriz'),
-#     'planoDescription': fields.String(required=True, description='FK do plano de alimentação')
-# })
+list_avisos = namespace.model('Lista de avisos', {
+    'id': fields.Integer(required=True, description='ID do aviso'),
+    'confinamentoId': fields.String(required=True, description='FK da confinamento'),
+    'dataAviso': fields.String(required=True, description='Data da criação do registro do aviso'),
+    'separar': fields.String(required=True, description='Flag para separação'),
+    'matrizDescription': fields.String(required=True, description='Descrição da matriz confinada'),
+    'separarDescription': fields.String(required=True, description='Descrição da flag separar'),
+    'active ': fields.Boolean(required=True, description='FK do plano de alimentação')
+})
 
-# list_confinamento_response = namespace.model('Resposta para lista de confinamentos', {
-#     'data': fields.Nested(list_confinamento, required=True, description='Lista de confinamentos')
-# })
+list_avisos_response = namespace.model('Resposta para lista de avisos', {
+    'data': fields.Nested(list_avisos, required=True, description='Lista de avisos')
+})
 
 headers = namespace.parser()
 
-@namespace.route('/insert')
+@namespace.route('/insert', methods=['POST'])
 @namespace.expect(headers)
 class CreateConfinamento(Resource):
     @namespace.expect(insert_aviso, validate=True)
@@ -51,25 +53,27 @@ class CreateConfinamento(Resource):
         except Exception as e:
             raise InternalServerError(e.args[0])
 
-# @namespace.route('/update/')
-# @namespace.expect(headers)
-# class UpdateRegistro(Resource):
-#     @namespace.expect(update_confinamento, validate=True)
-#     def put(self):
-#         """Atualiza um confinamento"""
-#         try:
-#             parser = reqparse.RequestParser()
-#             parser.add_argument('id', type=int)
-#             parser.add_argument('dataConfinamento', type=str)
-#             parser.add_argument('matrizId', type=int)
-#             parser.add_argument('planoId', type=int)
-#             args = parser.parse_args()
-#             confinamento = confinamentoCRUD.atualizarConfinamento(args)
-#             if not confinamento:
-#                 raise Exception("Error")
-#             return confinamento
-#         except Exception as e:
-#             raise InternalServerError(e.args[0])
+@namespace.route('/separarMatriz', methods=['PUT'])
+@namespace.expect(headers)
+class UpdateRegistro(Resource):
+    @namespace.expect(update_aviso, validate=True)
+    def put(self):
+        """Autorização de separação de uma matriz"""
+        try:
+            parser = reqparse.RequestParser()
+            
+            parser.add_argument('id', type=int)
+            parser.add_argument('separar', type=bool)
+
+            args = parser.parse_args()
+            aviso = avisoCRUD.separarMatriz(args)
+            
+            if not aviso:
+                raise Exception("Error")
+            
+            return aviso
+        except Exception as e:
+            raise InternalServerError(e.args[0])
 
 # @namespace.route('/<int:id>')
 # @namespace.param('id')
@@ -84,17 +88,17 @@ class CreateConfinamento(Resource):
 #             raise InternalServerError(e.args[0])
 
 
-# @namespace.route('/')
-# @namespace.expect(headers)
-# class ListaRegistros(Resource):
-#     @namespace.marshal_with(list_confinamento_response)
-#     def get(self):
-#         """Lista todos os confinamentos"""
-#         try:
-#             confinamentos = confinamentoCRUD.consultarConfinamentos()
-#             return {"data": confinamentos}
-#         except HTTPException as e:
-#             raise InternalServerError(e.args[0])
+@namespace.route('/')
+@namespace.expect(headers)
+class ListaRegistros(Resource):
+    @namespace.marshal_with(list_avisos_response)
+    def get(self):
+        """Lista todos os avisos pendentes"""
+        try:
+            avisos = avisoCRUD.consultarAvisos()
+            return {"data": avisos}
+        except HTTPException as e:
+            raise InternalServerError(e.args[0])
 
 
 # @namespace.route('/delete/<int:id>')

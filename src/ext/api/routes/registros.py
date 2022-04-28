@@ -9,7 +9,7 @@ import json
 namespace = Namespace(name='Registros', description='Registros', path='/registros')
 
 insert_registro = namespace.model('Dados para criação de um registro', {
-    'matriz': fields.Integer(required=True, description='FK da matriz'),
+    'matrizId': fields.Integer(required=True, description='FK da matriz'),
     'dataEntrada': fields.String(required=True, description='Dia da entrada da matriz no alimentador'),
     'dataSaida': fields.String(required=True, description='Dia da saida da matriz no alimentador'),
     'horaEntrada': fields.String(required=True, description='Hora de entrada da matriz no alimentador'),
@@ -20,7 +20,7 @@ insert_registro = namespace.model('Dados para criação de um registro', {
 
 update_registro = namespace.model('Dados para atualização de um registro', {
     'id': fields.Integer(required=True, description='ID do registro'),
-    'matriz': fields.Integer(required=True, description='FK da matriz'),
+    'matrizId': fields.Integer(required=True, description='FK da matriz'),
     'dataEntrada': fields.String(required=True, description='Dia da entrada da matriz no alimentador'),
     'dataSaida': fields.String(required=True, description='Dia da saida da matriz no alimentador'),
     'horaEntrada': fields.String(required=True, description='Hora de entrada da matriz no alimentador'),
@@ -31,7 +31,7 @@ update_registro = namespace.model('Dados para atualização de um registro', {
 
 list_registros = namespace.model('Lista de registros', {
     'id': fields.Integer(required=True, description='ID do registro'),
-    'matriz': fields.Integer(required=True, description='FK da matriz'),
+    'matrizId': fields.Integer(required=True, description='FK da matriz'),
     'dataEntrada': fields.String(required=True, description='Dia da entrada da matriz no alimentador'),
     'dataSaida': fields.String(required=True, description='Dia da saida da matriz no alimentador'),
     'horaEntrada': fields.String(required=True, description='Hora de entrada da matriz no alimentador'),
@@ -55,7 +55,7 @@ class CreateRegistro(Resource):
         """Cadastra um registro"""
         try:
             parser = reqparse.RequestParser()
-            parser.add_argument('matriz', type=int)
+            parser.add_argument('matrizId', type=int)
             parser.add_argument('dataEntrada', type=int)
             parser.add_argument('dataSaida', type=int)
             parser.add_argument('horaEntrada', type=int)

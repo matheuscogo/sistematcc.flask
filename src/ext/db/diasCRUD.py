@@ -25,9 +25,9 @@ def consultarDias():  # Read
         return Response(response=json.dumps("{success: false, message: "+ e.args[0] +", response: null}"), status=501)
 
 
-def consultarDia(id):  # Read
+def consultarDia(planoId, dia):  # Read
     try:
-        dia = db.session.query(Dia.Dias).filter_by(id=id).first()
+        dia = db.session.query(Dia.Dias).filter_by(dia=dia, planoId=planoId).first()
         if not dia:
             raise Exception("")
         return DiasSchema().dump(dia)

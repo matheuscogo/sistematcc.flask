@@ -74,14 +74,15 @@ class UpdateDia(Resource):
         except Exception as e:
             raise InternalServerError(e.args[0])
 
-@namespace.route('/<int:id>')
-@namespace.param('id')
+@namespace.route('/<int:dia>/<int:planoId>')
+@namespace.param('dia')
+@namespace.param('planoId')
 @namespace.expect(headers)
 class GetDia(Resource):
-    def get(self, id):
+    def get(self, dia, planoId):
         """Consulta um dia por id"""
         try:
-            dia = diasCRUD.cadastrarDia(id)
+            dia = diasCRUD.consultarDia(planoId=planoId, dia=dia)
             return dia
         except HTTPException as e:
             raise InternalServerError(e.args[0])
